@@ -1,5 +1,6 @@
 package com.it1shka.checkers
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -57,7 +58,13 @@ private val routes = listOf(
       NavHost(
         navController = navController,
         startDestination = AppScreen.BATTLE.name,
-        modifier = Modifier.padding(innerPadding)
+        modifier = Modifier.padding(innerPadding),
+        enterTransition = {
+          slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Down)
+        },
+        exitTransition = {
+          slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Down)
+        }
       ) {
         routes.forEach { route ->
           composable(route.screen.name) { route.layout() }
