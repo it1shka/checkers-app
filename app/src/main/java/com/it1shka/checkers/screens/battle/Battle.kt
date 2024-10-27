@@ -14,14 +14,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 
 data class BattleMode (
   val title: String,
   val subtitle: String,
   val icon: ImageVector,
 )
+
+enum class BotDifficulty {
+  EASY,
+  NORMAL,
+  HARD,
+  INSANE,
+}
 
 private val battleModes = listOf(
   BattleMode(
@@ -36,8 +46,9 @@ private val battleModes = listOf(
   ),
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable fun Battle() {
+  var difficulty by remember { mutableStateOf(BotDifficulty.NORMAL) }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -59,6 +70,10 @@ private val battleModes = listOf(
       battleModes.forEach {
         BattleModeCard(it)
       }
+      DifficultySelect(
+        difficulty = difficulty,
+        changeDifficulty = { difficulty = it }
+      )
     }
   }
 }
