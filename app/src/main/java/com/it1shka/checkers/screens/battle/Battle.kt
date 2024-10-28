@@ -16,12 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import com.it1shka.checkers.PersistentStorage
 import com.it1shka.checkers.R
+import kotlinx.coroutines.launch
 
 data class BattleMode (
   val title: String,
@@ -51,6 +56,21 @@ private val battleModes = listOf(
 
 @Composable fun Battle() {
   var difficulty by remember { mutableStateOf(BotDifficulty.NORMAL) }
+  val context = LocalContext.current
+  LaunchedEffect(context) {
+    PersistentStorage.getDifficulty(context).collect { value ->
+      if (value != null && value in BotDifficulty.entries.map { it.name }) {
+        difficulty = BotDifficulty.valueOf(value)
+      }
+    }
+  }
+  val coroutineScope = rememberCoroutineScope()
+  fun changeDifficulty(newDifficulty: BotDifficulty) {
+    difficulty = newDifficulty
+    coroutineScope.launch {
+      PersistentStorage.saveDifficulty(context, newDifficulty.name)
+    }
+  }
 
   Column(
     modifier = Modifier
@@ -81,7 +101,7 @@ private val battleModes = listOf(
       }
       DifficultySelect(
         difficulty = difficulty,
-        changeDifficulty = { difficulty = it }
+        changeDifficulty = { changeDifficulty(it) }
       )
     }
   }
