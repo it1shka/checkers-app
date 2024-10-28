@@ -50,7 +50,7 @@ private val navbarItems = listOf(
   )
 )
 
-@Composable fun Navbar(screen: AppScreen, changeScreen: (AppScreen) -> Unit) {
+@Composable fun Navbar(screen: AppScreen?, changeScreen: (AppScreen) -> Unit) {
   NavigationBar {
     navbarItems.forEach {
       NavigationBarItem(

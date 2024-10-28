@@ -5,14 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.history.History
@@ -40,10 +38,17 @@ private val routes = listOf(
 
 @Composable fun App() {
   val navController = rememberNavController()
-  var screen by remember { mutableStateOf(AppScreen.BATTLE) }
+  val backStackEntry by navController.currentBackStackEntryAsState()
 
-  LaunchedEffect(screen) {
-    navController.navigate(screen.name)
+  val screen = remember(backStackEntry) {
+    val route = backStackEntry?.destination?.route
+    if (route == null) null
+    else when {
+      route in AppScreen.entries.map { it.name } ->
+        AppScreen.valueOf(route)
+      else ->
+        null
+    }
   }
 
   MaterialTheme {
@@ -51,7 +56,7 @@ private val routes = listOf(
       bottomBar = {
         Navbar(
           screen = screen,
-          changeScreen = { screen = it }
+          changeScreen = { navController.navigate(it.name) }
         )
       }
     ) { innerPadding ->
