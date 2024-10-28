@@ -1,5 +1,6 @@
 package com.it1shka.checkers.screens.battle
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.painterResource
+import com.it1shka.checkers.R
 
 data class BattleMode (
   val title: String,
@@ -59,6 +62,12 @@ private val battleModes = listOf(
     Text(
       text = "Checkers Online",
       style = MaterialTheme.typography.headlineLarge,
+    )
+    Image(
+      modifier = Modifier
+        .padding(top = 20.dp, bottom = 20.dp),
+      painter = painterResource(id = R.drawable.checkers_banner),
+      contentDescription = "Checkers Online Banner",
     )
     Column (
       modifier = Modifier
