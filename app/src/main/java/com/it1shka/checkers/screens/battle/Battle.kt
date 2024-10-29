@@ -24,14 +24,37 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
+import com.it1shka.checkers.AppScreen
 import com.it1shka.checkers.PersistentStorage
 import com.it1shka.checkers.R
 import kotlinx.coroutines.launch
 
+enum class BattleModeType() {
+  ONLINE,
+  OFFLINE,
+}
+
 data class BattleMode (
+  val type: BattleModeType,
   val title: String,
   val subtitle: String,
   val icon: ImageVector,
+)
+
+private val battleModes = listOf(
+  BattleMode(
+    type = BattleModeType.ONLINE,
+    title = "Play Online",
+    subtitle = "Online mode",
+    icon = Icons.Filled.Search,
+  ),
+  BattleMode(
+    type = BattleModeType.OFFLINE,
+    title = "Play with Computer",
+    subtitle = "Offline mode",
+    icon = Icons.Filled.Home,
+  ),
 )
 
 enum class BotDifficulty {
@@ -41,20 +64,7 @@ enum class BotDifficulty {
   INSANE,
 }
 
-private val battleModes = listOf(
-  BattleMode(
-    title = "Play Online",
-    subtitle = "Online mode",
-    icon = Icons.Filled.Search,
-  ),
-  BattleMode(
-    title = "Play with Computer",
-    subtitle = "Offline mode",
-    icon = Icons.Filled.Home,
-  ),
-)
-
-@Composable fun Battle() {
+@Composable fun Battle(navController: NavController) {
   var difficulty by remember { mutableStateOf(BotDifficulty.NORMAL) }
   val context = LocalContext.current
   LaunchedEffect(context) {
@@ -69,6 +79,17 @@ private val battleModes = listOf(
     difficulty = newDifficulty
     coroutineScope.launch {
       PersistentStorage.saveDifficulty(context, newDifficulty.name)
+    }
+  }
+
+  fun onBattleStart(type: BattleModeType) {
+    when (type) {
+      BattleModeType.OFFLINE -> {
+        navController.navigate(AppScreen.OFFLINE_BATTLE.name)
+      }
+      BattleModeType.ONLINE -> {
+        navController.navigate(AppScreen.ONLINE_BATTLE.name)
+      }
     }
   }
 
@@ -97,7 +118,10 @@ private val battleModes = listOf(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       battleModes.forEach {
-        BattleModeCard(it)
+        BattleModeCard(
+          mode = it,
+          onClick = { onBattleStart(it.type) }
+        )
       }
       DifficultySelect(
         difficulty = difficulty,
