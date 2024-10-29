@@ -50,7 +50,7 @@ private data class Route (
 
   val routes = listOf(
     Route(AppScreen.BATTLE, { Battle(navController) }),
-    Route(AppScreen.OFFLINE_BATTLE, { OfflineBattle() }),
+    Route(AppScreen.OFFLINE_BATTLE, { OfflineBattle(navController) }),
     Route(AppScreen.ONLINE_BATTLE, { OnlineBattle() }),
     Route(AppScreen.HALL_OF_FAME, { Ranking() }),
     Route(AppScreen.HISTORY, { History() }),
