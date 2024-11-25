@@ -18,7 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@Composable fun BattleModeCard(mode: BattleMode, onClick: () -> Unit) {
+@Composable
+fun BattleModeCard(mode: BattleMode, onClick: () -> Unit) {
   OutlinedCard(
     modifier = Modifier.clickable(
       onClick = { onClick() }
@@ -28,7 +29,7 @@ import androidx.compose.ui.unit.dp
       color = MaterialTheme.colorScheme.outline,
     ),
   ) {
-    Row (
+    Row(
       modifier = Modifier
         .fillMaxWidth()
         .background(color = MaterialTheme.colorScheme.surfaceContainer),
@@ -42,7 +43,7 @@ import androidx.compose.ui.unit.dp
         imageVector = mode.icon,
         contentDescription = mode.title,
       )
-      Column (
+      Column(
         modifier = Modifier
           .fillMaxWidth()
           .padding(all = 10.dp)

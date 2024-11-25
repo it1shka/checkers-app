@@ -4,91 +4,47 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
-import com.it1shka.checkers.AppScreen
-import com.it1shka.checkers.PersistentStorage
+import androidx.compose.ui.unit.dp
+import com.it1shka.checkers.Preferences
 import com.it1shka.checkers.R
+import com.it1shka.checkers.app.AppScreen
 import kotlinx.coroutines.launch
 
-enum class BattleModeType() {
-  ONLINE,
-  OFFLINE,
-}
-
-data class BattleMode (
-  val type: BattleModeType,
-  val title: String,
-  val subtitle: String,
-  val icon: ImageVector,
-)
-
-private val battleModes = listOf(
-  BattleMode(
-    type = BattleModeType.ONLINE,
-    title = "Play Online",
-    subtitle = "Online mode",
-    icon = Icons.Filled.Search,
-  ),
-  BattleMode(
-    type = BattleModeType.OFFLINE,
-    title = "Play with Computer",
-    subtitle = "Offline mode",
-    icon = Icons.Filled.Home,
-  ),
-)
-
-enum class BotDifficulty {
-  EASY,
-  NORMAL,
-  HARD,
-  INSANE,
-}
-
-@Composable fun Battle(navController: NavController) {
-  var difficulty by remember { mutableStateOf(BotDifficulty.NORMAL) }
+@Composable
+fun Battle(navigateTo: (AppScreen) -> Unit) {
   val context = LocalContext.current
-  LaunchedEffect(context) {
-    PersistentStorage.getDifficulty(context).collect { value ->
-      if (value != null && value in BotDifficulty.entries.map { it.name }) {
-        difficulty = BotDifficulty.valueOf(value)
-      }
-    }
-  }
+
+  val difficulty by Preferences
+    .getDifficulty(context)
+    .collectAsState(BotDifficulty.NORMAL.name)
+
   val coroutineScope = rememberCoroutineScope()
   fun changeDifficulty(newDifficulty: BotDifficulty) {
-    difficulty = newDifficulty
     coroutineScope.launch {
-      PersistentStorage.saveDifficulty(context, newDifficulty.name)
+      Preferences.saveDifficulty(context, newDifficulty.name)
     }
   }
 
   fun onBattleStart(type: BattleModeType) {
     when (type) {
       BattleModeType.OFFLINE -> {
-        navController.navigate(AppScreen.OFFLINE_BATTLE.name)
+        navigateTo(AppScreen.OFFLINE_BATTLE)
       }
+
       BattleModeType.ONLINE -> {
-        navController.navigate(AppScreen.ONLINE_BATTLE.name)
+        navigateTo(AppScreen.ONLINE_BATTLE)
       }
     }
   }
@@ -110,7 +66,7 @@ enum class BotDifficulty {
       painter = painterResource(id = R.drawable.checkers_banner),
       contentDescription = "Checkers Online Banner",
     )
-    Column (
+    Column(
       modifier = Modifier
         .fillMaxWidth()
         .padding(start = 20.dp, end = 20.dp),

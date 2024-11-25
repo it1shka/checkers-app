@@ -6,14 +6,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.navigation.NavController
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 
-@Composable fun ConfirmBackHandler(
-  navController: NavController,
+@Composable
+fun ConfirmBackHandler(
   title: String,
   text: String,
   onBack: () -> Unit,
@@ -39,7 +38,6 @@ import androidx.compose.runtime.getValue
           onClick = {
             onBack()
             showAlert = false
-            navController.popBackStack()
           }
         )
       },

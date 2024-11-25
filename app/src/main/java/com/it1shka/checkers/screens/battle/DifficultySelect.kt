@@ -12,37 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 
-private data class DifficultyLevel (
-  val level: BotDifficulty,
-  val title: String,
-  val description: String,
-)
-
-private val levels = listOf(
-  DifficultyLevel(
-    level = BotDifficulty.EASY,
-    title = "Easy",
-    description = "Bot computes next 2 steps",
-  ),
-  DifficultyLevel(
-    level = BotDifficulty.NORMAL,
-    title = "Normal",
-    description = "Bot computes next 4 steps",
-  ),
-  DifficultyLevel(
-    level = BotDifficulty.HARD,
-    title = "Hard",
-    description = "Bot computes next 6 steps",
-  ),
-  DifficultyLevel(
-    level = BotDifficulty.INSANE,
-    title = "Insane",
-    description = "Bot tries to compute all possible steps",
-  ),
-)
-
-@Composable fun DifficultySelect(
-  difficulty: BotDifficulty,
+@Composable
+fun DifficultySelect(
+  difficulty: String,
   changeDifficulty: (BotDifficulty) -> Unit,
 ) {
   Column(
@@ -52,14 +24,14 @@ private val levels = listOf(
     Row(
       horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-      levels.forEach {
-        TextButton (
+      difficultyLevels.forEach {
+        TextButton(
           onClick = { changeDifficulty(it.level) },
           colors =
-            if (difficulty == it.level)
-              ButtonDefaults.filledTonalButtonColors()
-            else
-              ButtonDefaults.textButtonColors(),
+          if (difficulty == it.level.name)
+            ButtonDefaults.filledTonalButtonColors()
+          else
+            ButtonDefaults.textButtonColors(),
           contentPadding = PaddingValues(all = 4.dp),
           content = {
             Text(it.title)
@@ -68,7 +40,9 @@ private val levels = listOf(
       }
     }
     Text(
-      text = levels.find { it.level == difficulty }?.description ?: "No description",
+      text = difficultyLevels
+        .find { it.level.name == difficulty }
+        ?.description ?: "No description",
       style = MaterialTheme.typography.bodyMedium,
     )
   }
