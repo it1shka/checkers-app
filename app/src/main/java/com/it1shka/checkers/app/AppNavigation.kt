@@ -1,4 +1,4 @@
-package com.it1shka.checkers
+package com.it1shka.checkers.app
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -9,22 +9,31 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.ThumbUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 
-private data class NavbarItem (
+enum class AppScreen {
+  BATTLE,
+  OFFLINE_BATTLE,
+  ONLINE_BATTLE,
+  HALL_OF_FAME,
+  HISTORY,
+  PROFILE,
+}
+
+data class AppRoute(
+  val screen: AppScreen,
+  val composable: @Composable () -> Unit
+)
+
+data class NavbarItem(
   val screen: AppScreen,
   val title: String,
   val selectedIcon: ImageVector,
   val regularIcon: ImageVector,
 )
 
-private val navbarItems = listOf(
+val navbarItems = listOf(
   NavbarItem(
     screen = AppScreen.BATTLE,
     title = "Battle",
@@ -50,31 +59,3 @@ private val navbarItems = listOf(
     regularIcon = Icons.Outlined.AccountCircle,
   )
 )
-
-@Composable fun Navbar(screen: AppScreen?, changeScreen: (AppScreen) -> Unit) {
-  val active = remember(screen) {
-    screen in navbarItems.map { it.screen }
-  }
-
-  if (active) {
-    NavigationBar {
-      navbarItems.forEach {
-        NavigationBarItem(
-          icon = {
-            Icon(
-              imageVector = if (it.screen == screen) {
-                it.selectedIcon
-              } else {
-                it.regularIcon
-              },
-              contentDescription = it.title,
-            )
-          },
-          label = { Text(it.title) },
-          selected = it.screen == screen,
-          onClick = { changeScreen(it.screen) }
-        )
-      }
-    }
-  }
-}
