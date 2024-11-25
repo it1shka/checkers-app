@@ -18,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@Composable fun BattleModeCard(mode: BattleMode) {
+@Composable fun BattleModeCard(mode: BattleMode, onClick: () -> Unit) {
   OutlinedCard(
     modifier = Modifier.clickable(
-      onClick = {}
+      onClick = { onClick() }
     ),
     border = BorderStroke(
       width = 1.dp,

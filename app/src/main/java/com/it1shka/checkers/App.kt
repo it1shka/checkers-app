@@ -14,11 +14,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.history.History
+import com.it1shka.checkers.screens.offline.OfflineBattle
+import com.it1shka.checkers.screens.online.OnlineBattle
 import com.it1shka.checkers.screens.profile.Profile
 import com.it1shka.checkers.screens.ranking.Ranking
 
 enum class AppScreen {
   BATTLE,
+  OFFLINE_BATTLE,
+  ONLINE_BATTLE,
   HALL_OF_FAME,
   HISTORY,
   PROFILE,
@@ -27,13 +31,6 @@ enum class AppScreen {
 private data class Route (
   val screen: AppScreen,
   val layout: @Composable () -> Unit,
-)
-
-private val routes = listOf(
-  Route(AppScreen.BATTLE, { Battle() }),
-  Route(AppScreen.HALL_OF_FAME, { Ranking() }),
-  Route(AppScreen.HISTORY, { History() }),
-  Route(AppScreen.PROFILE, { Profile() }),
 )
 
 @Composable fun App() {
@@ -50,6 +47,15 @@ private val routes = listOf(
         null
     }
   }
+
+  val routes = listOf(
+    Route(AppScreen.BATTLE, { Battle(navController) }),
+    Route(AppScreen.OFFLINE_BATTLE, { OfflineBattle(navController) }),
+    Route(AppScreen.ONLINE_BATTLE, { OnlineBattle() }),
+    Route(AppScreen.HALL_OF_FAME, { Ranking() }),
+    Route(AppScreen.HISTORY, { History() }),
+    Route(AppScreen.PROFILE, { Profile() }),
+  )
 
   MaterialTheme {
     Scaffold(
