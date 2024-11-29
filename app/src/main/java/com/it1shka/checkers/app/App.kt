@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.it1shka.checkers.screens.battle.Battle
+import com.it1shka.checkers.screens.offline.Offline
 
 @Composable
 fun App(viewModel: AppViewModel = viewModel()) {
@@ -28,7 +29,9 @@ fun App(viewModel: AppViewModel = viewModel()) {
     AppRoute(AppScreen.BATTLE, {
       Battle { viewModel.navigateTo(it) }
     }),
-    AppRoute(AppScreen.OFFLINE_BATTLE, { }),
+    AppRoute(AppScreen.OFFLINE_BATTLE, {
+      Offline { viewModel.navigateTo(it) }
+    }),
     AppRoute(AppScreen.ONLINE_BATTLE, { }),
     AppRoute(AppScreen.HALL_OF_FAME, { }),
     AppRoute(AppScreen.HISTORY, { }),
