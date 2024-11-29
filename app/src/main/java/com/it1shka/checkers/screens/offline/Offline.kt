@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.it1shka.checkers.app.AppScreen
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
+import com.it1shka.checkers.components.SquareState
 
 @Composable
 fun Offline(navigateTo: (AppScreen) -> Unit) {
@@ -40,7 +41,15 @@ fun Offline(navigateTo: (AppScreen) -> Unit) {
       )
       // TODO:
       Chessboard(
-
+        state = listOf(
+          29 to SquareState.BLACK_KING,
+          30 to SquareState.BLACK_MAN,
+          13 to SquareState.RED_KING,
+          15 to SquareState.RED_MAN,
+        ),
+        highlight = listOf(
+          29, 25,
+        )
       )
       Text(
         text = "Your turn", // TODO:
