@@ -1,6 +1,7 @@
 package com.it1shka.checkers
 
 import com.it1shka.checkers.gamelogic.Board
+import com.it1shka.checkers.gamelogic.BoardMove
 import com.it1shka.checkers.gamelogic.Piece
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
@@ -57,6 +58,71 @@ class BoardTest {
     for ((square, expected) in testCases) {
       val actual = board.pieceAt(square)
       assertEquals(expected, actual)
+    }
+  }
+}
+
+class BoardMoveTest {
+  @Test
+  fun `correctly creates valid moves`() {
+    val testCases = listOf(
+      1 to 6,
+      2 to 6,
+      10 to 19,
+      23 to 16,
+      32 to 23,
+    )
+    for ((from, to) in testCases) {
+      try {
+        BoardMove(Square(from) to Square(to))
+      } catch (_: Exception) {
+        fail("$from -> $to should be a valid move")
+      }
+    }
+  }
+
+  @Test
+  fun `throws exception for invalid moves`() {
+    val testCases = listOf(
+      1 to 15,
+      1 to 4,
+      18 to 19,
+      32 to 18,
+      14 to 22,
+    )
+    for ((from, to) in testCases) {
+      assertThrows(IllegalArgumentException::class.java) {
+        BoardMove(Square(from) to Square(to))
+      }
+    }
+  }
+
+  @Test
+  fun `detects when move is not a jump`() {
+    val testCases = listOf(
+      24 to 20,
+      13 to 9,
+      3 to 7,
+      15 to 18,
+    )
+    for ((from, to) in testCases) {
+      val actual = BoardMove(Square(from) to Square(to)).isJump
+      assertEquals(false, actual)
+    }
+  }
+
+  @Test
+  fun `detects when move is indeed a jump`() {
+    val testCases = listOf(
+      1 to 10,
+      2 to 9,
+      19 to 10,
+      22 to 15,
+      22 to 31,
+    )
+    for ((from, to) in testCases) {
+      val actual = BoardMove(Square(from) to Square(to)).isJump
+      assertEquals(true, actual)
     }
   }
 }

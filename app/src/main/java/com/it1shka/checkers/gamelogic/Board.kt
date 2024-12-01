@@ -1,5 +1,7 @@
 package com.it1shka.checkers.gamelogic
 
+import kotlin.math.abs
+
 private data object BoardConstants {
   const val RED_PIECES_START = 1
   const val RED_PIECES_END = 12
@@ -16,6 +18,41 @@ private data object BoardConstants {
   const val SYMBOL_EMPTY = ' '
   const val SYMBOL_SQUARE = '*'
 }
+
+val Pair<Square, Square>.isValidMove: Boolean
+  get() {
+    val (fromRow, fromCol) = this.first.position.value
+    val (toRow, toCol) = this.second.position.value
+    val rowDelta = abs(toRow - fromRow)
+    val colDelta = abs(toCol - fromCol)
+    return rowDelta == colDelta && rowDelta in 1..2
+  }
+
+@JvmInline
+value class BoardMove(private val move: Pair<Square, Square>) {
+  init {
+    require(move.isValidMove) {
+      "Move should be either normal move or a jump"
+    }
+  }
+
+  val from: Square
+    get() = move.first
+
+  val to: Square
+    get() = move.second
+
+  val isJump: Boolean
+    get() {
+      val delta = abs(from.position.row - to.position.row)
+      return delta == 2
+    }
+}
+
+val Pair<Square, Square>.asMove: BoardMove?
+  get() = if (this.isValidMove)
+    BoardMove(this)
+    else null
 
 data class Board (
   val turn: PieceColor,
