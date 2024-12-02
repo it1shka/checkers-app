@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,10 +33,18 @@ fun App(viewModel: AppViewModel = viewModel()) {
     AppRoute(AppScreen.OFFLINE_BATTLE, {
       Offline { viewModel.navigateTo(it) }
     }),
-    AppRoute(AppScreen.ONLINE_BATTLE, { }),
-    AppRoute(AppScreen.HALL_OF_FAME, { }),
-    AppRoute(AppScreen.HISTORY, { }),
-    AppRoute(AppScreen.PROFILE, { })
+    AppRoute(AppScreen.ONLINE_BATTLE, {
+      Text("TODO: ")
+    }),
+    AppRoute(AppScreen.HALL_OF_FAME, {
+      Text("TODO: ")
+    }),
+    AppRoute(AppScreen.HISTORY, {
+      Text("TODO: ")
+    }),
+    AppRoute(AppScreen.PROFILE, {
+      Text("TODO: ")
+    })
   )
 
   MaterialTheme {

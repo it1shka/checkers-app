@@ -56,7 +56,7 @@ class BoardTest {
     )
     val board = Board.new()
     for ((square, expected) in testCases) {
-      val actual = board.pieceAt(square)
+      val actual = board.pieceAt(Square(square))
       assertEquals(expected, actual)
     }
   }

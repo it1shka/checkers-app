@@ -47,12 +47,42 @@ value class BoardMove(private val move: Pair<Square, Square>) {
       val delta = abs(from.position.row - to.position.row)
       return delta == 2
     }
+
+  val hitSquare: Square?
+    get() {
+      if (!isJump) return null
+      val (row1, col1) = from.position.value
+      val (row2, col2) = to.position.value
+      val newRow = (row1 + row2) / 2
+      val newCol = (col1 + col2) / 2
+      return (newRow to newCol).asPosition?.square
+    }
 }
 
-val Pair<Square, Square>.asMove: BoardMove?
+val Pair<Square, Square>.squarePairAsMove: BoardMove?
   get() = if (this.isValidMove)
     BoardMove(this)
     else null
+
+val Pair<Int, Int>.intPairAsMove: BoardMove?
+  get() {
+    val (fromInt, toInt) = this
+    val maybeFrom = fromInt.asSquare
+    val maybeTo = toInt.asSquare
+    if (maybeFrom == null || maybeTo == null) return null
+    return (maybeFrom to maybeTo).squarePairAsMove
+  }
+
+private operator fun Pair<Int, Int>.times(scalar: Int): Pair<Int, Int> {
+  val (row, col) = this
+  return (row * scalar to col * scalar)
+}
+
+private operator fun Pair<Int, Int>.plus(another: Pair<Int, Int>): Pair<Int, Int> {
+  val (row1, col1) = this
+  val (row2, col2) = another
+  return (row1 + row2 to col1 + col2)
+}
 
 data class Board (
   val turn: PieceColor,
@@ -99,11 +129,97 @@ data class Board (
     return pieces.find { it.square == square }
   }
 
-  fun pieceAt(square: Int): Piece? {
-    val maybeSquare = square.asSquare
-    return when (maybeSquare) {
-      is Square -> pieceAt(maybeSquare)
-      else -> null
+  private fun auxMovesAt(square: Square): List<BoardMove> {
+    val piece = pieceAt(square)
+    if (piece == null) return listOf()
+    val directions = when {
+      piece.type == PieceType.MAN && piece.color == PieceColor.BLACK ->
+        listOf(-1 to -1, -1 to 1)
+      piece.type == PieceType.MAN && piece.color == PieceColor.RED ->
+        listOf(1 to -1, 1 to 1)
+      else ->
+        listOf(-1 to -1, -1 to 1, 1 to -1, 1 to 1)
+    }
+    val current = piece.square.position.value
+    val moves = mutableListOf<BoardMove>()
+    var jump = false
+    for (direction in directions) {
+      val square = (current + direction).asPosition?.square
+      if (square == null) continue
+      val target = pieceAt(square)
+      if (target == null) {
+        moves += BoardMove(piece.square to square)
+        continue
+      }
+      if (target.color == PieceColor.opposite(piece.color)) {
+        val jumpSquare = (current + direction * 2).asPosition?.square
+        if (jumpSquare == null || pieceAt(jumpSquare) != null) continue
+        jump = true
+        moves += BoardMove(piece.square to jumpSquare)
+        continue
+      }
+    }
+    return if (jump)
+      moves.filter { it.isJump }
+      else moves
+  }
+
+  val possibleMoves: List<BoardMove>
+    get() {
+      if (forcedJump != null) {
+        return auxMovesAt(forcedJump)
+          .filter { it.isJump }
+      }
+      val moves = pieces
+        .filter { it.color == turn }
+        .flatMap { auxMovesAt(it.square) }
+      val jump = moves
+        .find { it.isJump }
+        .let { it != null }
+      return if (jump)
+        moves.filter { it.isJump }
+        else moves
+    }
+
+  fun possibleMovesAt(square: Square): List<BoardMove> {
+    return possibleMoves
+      .filter { it.from == square }
+  }
+
+  fun makeMove(move: BoardMove): Board? = when {
+    move !in possibleMoves -> null
+    !move.isJump -> {
+      val movingPiece = pieces.find { it.square == move.from }
+      if (movingPiece == null) null
+      else {
+        val movedPiece = movingPiece.copy(square = move.to)
+        copy(
+          turn = PieceColor.opposite(turn),
+          pieces = pieces
+            .filter { it != movingPiece }
+            .plus(movedPiece)
+        )
+      }
+    }
+    else -> {
+      val movingPiece = pieces.find { it.square == move.from }
+      val hitSquare = move.hitSquare
+      if (movingPiece == null || hitSquare == null) null
+      else {
+        val movedPiece = movingPiece.copy(square = move.to)
+        val nextBoard = copy(
+          forcedJump = move.to,
+          pieces = pieces
+            .filter { it != movingPiece && it.square != hitSquare }
+            .plus(movedPiece)
+        )
+        if (nextBoard.possibleMoves.isEmpty())
+          nextBoard.copy (
+            forcedJump = null,
+            turn = PieceColor.opposite(turn),
+          )
+          else nextBoard
+      }
     }
   }
 
