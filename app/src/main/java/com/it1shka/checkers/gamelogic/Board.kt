@@ -17,6 +17,9 @@ private data object BoardConstants {
   const val SYMBOL_RED_KING = 'R'
   const val SYMBOL_EMPTY = ' '
   const val SYMBOL_SQUARE = '*'
+
+  val BLACK_KINGS = 1..4
+  val RED_KINGS = 29..32
 }
 
 val Pair<Square, Square>.isValidMove: Boolean
@@ -192,7 +195,21 @@ data class Board (
       val movingPiece = pieces.find { it.square == move.from }
       if (movingPiece == null) null
       else {
-        val movedPiece = movingPiece.copy(square = move.to)
+        val kings = if (movingPiece.color == PieceColor.BLACK)
+          BoardConstants.BLACK_KINGS
+          else BoardConstants.RED_KINGS
+        val movedType = when {
+          movingPiece.type == PieceType.KING ->
+            PieceType.KING
+          move.to.value in kings ->
+            PieceType.KING
+          else ->
+            PieceType.MAN
+        }
+        val movedPiece = movingPiece.copy(
+          square = move.to,
+          type = movedType
+        )
         copy(
           turn = PieceColor.opposite(turn),
           pieces = pieces
@@ -206,7 +223,21 @@ data class Board (
       val hitSquare = move.hitSquare
       if (movingPiece == null || hitSquare == null) null
       else {
-        val movedPiece = movingPiece.copy(square = move.to)
+        val kings = if (movingPiece.color == PieceColor.BLACK)
+          BoardConstants.BLACK_KINGS
+        else BoardConstants.RED_KINGS
+        val movedType = when {
+          movingPiece.type == PieceType.KING ->
+            PieceType.KING
+          move.to.value in kings ->
+            PieceType.KING
+          else ->
+            PieceType.MAN
+        }
+        val movedPiece = movingPiece.copy(
+          square = move.to,
+          type = movedType
+        )
         val nextBoard = copy(
           forcedJump = move.to,
           pieces = pieces
