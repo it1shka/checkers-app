@@ -51,7 +51,7 @@ private fun isSquare(index: Int): Boolean {
 }
 
 private fun indexToSquare(index: Int): Int {
-  return index / 2 + 1;
+  return index / 2 + 1
 }
 
 @Composable
@@ -86,7 +86,7 @@ fun Chessboard(
               onSquareClick(square)
             }
         ) {
-          when (mappedState.get(square)) {
+          when (mappedState[square]) {
             SquareState.BLACK_MAN -> {
               Box(
                 modifier = pieceModifier

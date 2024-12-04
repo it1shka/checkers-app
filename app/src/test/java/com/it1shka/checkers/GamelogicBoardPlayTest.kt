@@ -17,7 +17,7 @@ class BoardPlayTest {
       11 to 15,
       19 to 10,
     )
-    var board = Board.new();
+    var board = Board.new()
     for (maybeMove in moves) {
       val move = maybeMove.intPairAsMove
       if (move == null) {
@@ -56,7 +56,7 @@ class BoardPlayTest {
       7 to 16,
       18 to 11,
     )
-    var board = Board.new();
+    var board = Board.new()
     for (maybeMove in moves) {
       val move = maybeMove.intPairAsMove
       if (move == null) {
