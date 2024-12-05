@@ -65,7 +65,7 @@ value class BoardMove(private val move: Pair<Square, Square>) {
 val Pair<Square, Square>.squarePairAsMove: BoardMove?
   get() = if (this.isValidMove)
     BoardMove(this)
-    else null
+  else null
 
 val Pair<Int, Int>.intPairAsMove: BoardMove?
   get() {
@@ -87,7 +87,7 @@ private operator fun Pair<Int, Int>.plus(another: Pair<Int, Int>): Pair<Int, Int
   return (row1 + row2 to col1 + col2)
 }
 
-data class Board (
+data class Board(
   val turn: PieceColor,
   val pieces: List<Piece>,
   private val forcedJump: Square?
@@ -138,8 +138,10 @@ data class Board (
     val directions = when {
       piece.type == PieceType.MAN && piece.color == PieceColor.BLACK ->
         listOf(-1 to -1, -1 to 1)
+
       piece.type == PieceType.MAN && piece.color == PieceColor.RED ->
         listOf(1 to -1, 1 to 1)
+
       else ->
         listOf(-1 to -1, -1 to 1, 1 to -1, 1 to 1)
     }
@@ -164,7 +166,7 @@ data class Board (
     }
     return if (jump)
       moves.filter { it.isJump }
-      else moves
+    else moves
   }
 
   val possibleMoves: List<BoardMove>
@@ -181,7 +183,7 @@ data class Board (
         .let { it != null }
       return if (jump)
         moves.filter { it.isJump }
-        else moves
+      else moves
     }
 
   fun possibleMovesAt(square: Square): List<BoardMove> {
@@ -197,12 +199,14 @@ data class Board (
       else {
         val kings = if (movingPiece.color == PieceColor.BLACK)
           BoardConstants.BLACK_KINGS
-          else BoardConstants.RED_KINGS
+        else BoardConstants.RED_KINGS
         val movedType = when {
           movingPiece.type == PieceType.KING ->
             PieceType.KING
+
           move.to.value in kings ->
             PieceType.KING
+
           else ->
             PieceType.MAN
         }
@@ -218,6 +222,7 @@ data class Board (
         )
       }
     }
+
     else -> {
       val movingPiece = pieces.find { it.square == move.from }
       val hitSquare = move.hitSquare
@@ -229,8 +234,10 @@ data class Board (
         val movedType = when {
           movingPiece.type == PieceType.KING ->
             PieceType.KING
+
           move.to.value in kings ->
             PieceType.KING
+
           else ->
             PieceType.MAN
         }
@@ -245,11 +252,11 @@ data class Board (
             .plus(movedPiece)
         )
         if (nextBoard.possibleMoves.isEmpty())
-          nextBoard.copy (
+          nextBoard.copy(
             forcedJump = null,
             turn = PieceColor.opposite(turn),
           )
-          else nextBoard
+        else nextBoard
       }
     }
   }
@@ -270,10 +277,13 @@ data class Board (
         val symbol = when {
           maybePiece.type == PieceType.MAN && maybePiece.color == PieceColor.BLACK ->
             BoardConstants.SYMBOL_BLACK_MAN
+
           maybePiece.type == PieceType.KING && maybePiece.color == PieceColor.BLACK ->
             BoardConstants.SYMBOL_BLACK_KING
+
           maybePiece.type == PieceType.MAN && maybePiece.color == PieceColor.RED ->
             BoardConstants.SYMBOL_RED_MAN
+
           else ->
             BoardConstants.SYMBOL_RED_KING
         }

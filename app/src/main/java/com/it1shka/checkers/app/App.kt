@@ -4,55 +4,34 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.it1shka.checkers.screens.battle.Battle
-import com.it1shka.checkers.screens.offline.Offline
 
 @Composable
-fun App(viewModel: AppViewModel = viewModel()) {
+fun App() {
   val navController = rememberNavController()
-  val screen by viewModel.screen.collectAsState()
-  LaunchedEffect(screen) {
-    navController.navigate(screen.name)
+  val backStackEntry by navController.currentBackStackEntryAsState()
+  val currentScreen = remember(backStackEntry) {
+    val currentRoute = backStackEntry?.destination?.route
+    currentRoute?.let {
+      AppScreen.valueOf(currentRoute)
+    }
   }
 
-  // TODO: complete the routing
-  val routes = listOf(
-    AppRoute(AppScreen.BATTLE, {
-      Battle { viewModel.navigateTo(it) }
-    }),
-    AppRoute(AppScreen.OFFLINE_BATTLE, {
-      Offline { viewModel.navigateTo(it) }
-    }),
-    AppRoute(AppScreen.ONLINE_BATTLE, {
-      Text("TODO: ")
-    }),
-    AppRoute(AppScreen.HALL_OF_FAME, {
-      Text("TODO: ")
-    }),
-    AppRoute(AppScreen.HISTORY, {
-      Text("TODO: ")
-    }),
-    AppRoute(AppScreen.PROFILE, {
-      Text("TODO: ")
-    })
-  )
+  val routes = getRouting(navController)
 
   MaterialTheme {
     Scaffold(
       bottomBar = {
         AppNavbar(
-          screen = screen,
-          changeScreen = { viewModel.navigateTo(it) }
+          screen = currentScreen,
+          changeScreen = { navController.navigate(it.name) }
         )
       }
     ) { innerPadding ->

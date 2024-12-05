@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 
 @Composable
-fun AppNavbar(screen: AppScreen, changeScreen: (AppScreen) -> Unit) {
+fun AppNavbar(screen: AppScreen?, changeScreen: (AppScreen) -> Unit) {
   val visible = remember(screen) {
     screen in navbarItems.map { it.screen }
   }

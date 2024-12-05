@@ -17,13 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.it1shka.checkers.Preferences
 import com.it1shka.checkers.R
 import com.it1shka.checkers.app.AppScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun Battle(navigateTo: (AppScreen) -> Unit) {
+fun Battle(nav: NavController) {
   val context = LocalContext.current
 
   val difficulty by Preferences
@@ -40,11 +41,11 @@ fun Battle(navigateTo: (AppScreen) -> Unit) {
   fun onBattleStart(type: BattleModeType) {
     when (type) {
       BattleModeType.OFFLINE -> {
-        navigateTo(AppScreen.OFFLINE_BATTLE)
+        nav.navigate(AppScreen.OFFLINE_BATTLE.name)
       }
 
       BattleModeType.ONLINE -> {
-        navigateTo(AppScreen.ONLINE_BATTLE)
+        nav.navigate(AppScreen.ONLINE_BATTLE.name)
       }
     }
   }

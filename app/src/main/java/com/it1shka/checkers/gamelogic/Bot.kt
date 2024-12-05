@@ -125,7 +125,7 @@ class BotMinimax(private val config: BotMinimaxConfig = BotMinimaxConfig.default
 
     return if (board.turn == maximizing)
       scores.max()
-      else scores.min()
+    else scores.min()
   }
 
   private fun evaluateBoard(board: Board, color: PieceColor): Double {
