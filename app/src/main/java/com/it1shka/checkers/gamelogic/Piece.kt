@@ -28,9 +28,9 @@ value class Square(private val square: Int) {
     get() {
       val row = (square + 3) / 4
       val column = if (row % 2 == 0) {
-        (square - (row -1) * 4) * 2 - 1
+        (square - (row - 1) * 4) * 2 - 1
       } else {
-        (square - (row -1) * 4) * 2
+        (square - (row - 1) * 4) * 2
       }
       return Position(row to column)
     }
@@ -39,7 +39,7 @@ value class Square(private val square: Int) {
 val Int.asSquare: Square?
   get() = if (this.isValidSquare)
     Square(this)
-    else null
+  else null
 
 val Pair<Int, Int>.isValidPosition: Boolean
   get() {
@@ -72,7 +72,7 @@ value class Position(private val position: Pair<Int, Int>) {
 val Pair<Int, Int>.asPosition: Position?
   get() = if (this.isValidPosition)
     Position(this)
-    else null
+  else null
 
 enum class PieceType {
   MAN,
@@ -91,7 +91,7 @@ enum class PieceColor {
   }
 }
 
-data class Piece (
+data class Piece(
   val type: PieceType,
   val color: PieceColor,
   val square: Square,

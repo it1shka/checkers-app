@@ -1,5 +1,7 @@
 package com.it1shka.checkers.app
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
@@ -9,8 +11,13 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
+import com.it1shka.checkers.screens.battle.Battle
+import com.it1shka.checkers.screens.offline.Offline
 
 enum class AppScreen {
   BATTLE,
@@ -24,6 +31,35 @@ enum class AppScreen {
 data class AppRoute(
   val screen: AppScreen,
   val composable: @Composable () -> Unit
+)
+
+fun getRouting(navController: NavController) = listOf(
+  AppRoute(AppScreen.BATTLE, {
+    Battle(nav = navController)
+  }),
+  AppRoute(AppScreen.OFFLINE_BATTLE, {
+    Offline(nav = navController)
+  }),
+  AppRoute(AppScreen.ONLINE_BATTLE, {
+    Column(modifier = Modifier.fillMaxSize()) {
+      Text("TODO: ")
+    }
+  }),
+  AppRoute(AppScreen.HALL_OF_FAME, {
+    Column(modifier = Modifier.fillMaxSize()) {
+      Text("TODO: ")
+    }
+  }),
+  AppRoute(AppScreen.HISTORY, {
+    Column(modifier = Modifier.fillMaxSize()) {
+      Text("TODO: ")
+    }
+  }),
+  AppRoute(AppScreen.PROFILE, {
+    Column(modifier = Modifier.fillMaxSize()) {
+      Text("TODO: ")
+    }
+  })
 )
 
 data class NavbarItem(

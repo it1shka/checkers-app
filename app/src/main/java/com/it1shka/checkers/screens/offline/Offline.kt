@@ -10,18 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.it1shka.checkers.app.AppScreen
+import androidx.navigation.NavController
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.components.SquareState
 
 @Composable
-fun Offline(navigateTo: (AppScreen) -> Unit) {
+fun Offline(nav: NavController) {
   ConfirmBackHandler(
     title = "Are you sure?",
     text = "You will lose this battle"
   ) {
-    navigateTo(AppScreen.BATTLE)
+    nav.popBackStack()
   }
 
   Column(
@@ -30,7 +30,7 @@ fun Offline(navigateTo: (AppScreen) -> Unit) {
       .fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
-  ){
+  ) {
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(12.dp),
