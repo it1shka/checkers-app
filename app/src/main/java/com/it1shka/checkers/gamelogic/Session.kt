@@ -69,10 +69,15 @@ data class GameSession(
     if (nextBoard == null) return null
     return GameSession(
       board = nextBoard,
-      cache = cache +
-        (nextBoard to cache.getOrDefault(nextBoard, 0) + 1),
-      movesWithoutCapture = movesWithoutCapture +
-        if (board.pieces.size == nextBoard.pieces.size) 1 else 0,
+      cache = (
+        cache +
+        (nextBoard to cache.getOrDefault(nextBoard, 0) + 1)
+      ),
+      movesWithoutCapture = (
+        if (board.pieces.size == nextBoard.pieces.size)
+          movesWithoutCapture + 1
+          else 0
+      ),
       history = completeHistory,
     )
   }
