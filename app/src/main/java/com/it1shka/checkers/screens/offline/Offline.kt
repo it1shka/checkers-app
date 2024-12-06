@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import com.it1shka.checkers.Preferences
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.components.SquareState
@@ -28,10 +31,21 @@ import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
 import com.it1shka.checkers.gamelogic.asSquare
+import com.it1shka.checkers.screens.battle.BotDifficulty
 
 @Composable
 fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   val state by viewModel.state.collectAsState()
+
+  val context = LocalContext.current
+  val botDifficulty by Preferences
+    .getDifficulty(context)
+    .collectAsState(BotDifficulty.NORMAL.name)
+
+  LaunchedEffect(botDifficulty) {
+    val difficulty = BotDifficulty.valueOf(botDifficulty)
+    viewModel.setDifficulty(difficulty)
+  }
 
   val chessboardState = remember(state) {
     state.session.pieces.map { piece ->
