@@ -1,11 +1,12 @@
 package com.it1shka.checkers.gamelogic
 
-private const val RULE_WITHOUT_MOVES = 40
+private const val RULE_WITHOUT_CAPTURE = 40
 private const val RULE_REPEAT_BOARD = 3
 
 enum class GameStatus {
   ACTIVE,
-  DRAW,
+  DRAW_WITHOUT_CAPTURE,
+  DRAW_REPEAT_BOARD,
   BLACK_WON,
   RED_WON,
 }
@@ -51,11 +52,11 @@ data class GameSession(
           else -> GameStatus.RED_WON
         }
       }
-      if (movesWithoutCapture >= RULE_WITHOUT_MOVES) {
-        return GameStatus.DRAW
+      if (movesWithoutCapture >= RULE_WITHOUT_CAPTURE) {
+        return GameStatus.DRAW_WITHOUT_CAPTURE
       }
       if (cache.values.any { it >= RULE_REPEAT_BOARD }) {
-        return GameStatus.DRAW
+        return GameStatus.DRAW_REPEAT_BOARD
       }
       return GameStatus.ACTIVE
     }

@@ -2,8 +2,15 @@ package com.it1shka.checkers.screens.offline
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -13,9 +20,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.style.TextAlign
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.components.SquareState
+import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
 import com.it1shka.checkers.gamelogic.asSquare
@@ -57,6 +66,30 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
     }
   }
 
+  val turnText = remember(state) {
+    if (state.session.turn == state.playerColor)
+      "Your turn"
+      else "Bot's turn"
+  }
+
+  val statusText = remember(state) {
+    when (state.session.status) {
+      GameStatus.RED_WON ->
+        if (state.playerColor == PieceColor.RED)
+          "You won"
+          else "You lost"
+      GameStatus.BLACK_WON ->
+        if (state.playerColor == PieceColor.BLACK)
+          "You won"
+          else "You lost"
+      GameStatus.DRAW_REPEAT_BOARD ->
+        "Draw (position repeated 3 times)"
+      GameStatus.DRAW_WITHOUT_CAPTURE ->
+        "Draw (40 moves without capture)"
+      else -> "Active"
+    }
+  }
+
   ConfirmBackHandler(
     title = "Are you sure?",
     text = "You will lose this battle"
@@ -75,11 +108,39 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+      ) {
+        Text(
+          text = state.bot.name,
+          style = MaterialTheme.typography.bodyLarge,
+          textAlign = TextAlign.End,
+          modifier = Modifier.padding(end = 10.dp),
+        )
+        Icon(
+          Icons.Default.AccountCircle,
+          contentDescription = "Bot Icon",
+        )
+      }
       Chessboard(
         state = chessboardState,
         highlight = chessboardHighlight,
         onSquareClick = { squareClick(it) }
       )
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+      ) {
+        Text(
+          text = turnText,
+          style = MaterialTheme.typography.bodyLarge,
+        )
+        Text(
+          text = statusText,
+          style = MaterialTheme.typography.bodyLarge,
+        )
+      }
     }
   }
 }
