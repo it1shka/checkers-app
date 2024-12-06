@@ -17,21 +17,21 @@ val difficultyLevels = listOf(
   DifficultyLevel(
     level = BotDifficulty.EASY,
     title = "Easy",
-    description = "Bot computes next 2 steps",
+    description = "Bot makes random moves",
   ),
   DifficultyLevel(
     level = BotDifficulty.NORMAL,
     title = "Normal",
-    description = "Bot computes next 4 steps",
+    description = "Bot computes next 2 steps",
   ),
   DifficultyLevel(
     level = BotDifficulty.HARD,
     title = "Hard",
-    description = "Bot computes next 6 steps",
+    description = "Bot computes next 4 steps",
   ),
   DifficultyLevel(
     level = BotDifficulty.INSANE,
     title = "Insane",
-    description = "Bot tries to compute all possible steps",
+    description = "Bot computes next 6 steps",
   ),
 )
