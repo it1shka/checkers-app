@@ -27,6 +27,7 @@ import com.it1shka.checkers.Preferences
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.components.SquareState
+import com.it1shka.checkers.components.withConfirmation
 import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
@@ -35,9 +36,10 @@ import com.it1shka.checkers.screens.battle.BotDifficulty
 
 @Composable
 fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
+  val context = LocalContext.current
+
   val state by viewModel.state.collectAsState()
 
-  val context = LocalContext.current
   val botDifficulty by Preferences
     .getDifficulty(context)
     .collectAsState(BotDifficulty.NORMAL.name)
@@ -104,12 +106,36 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
     }
   }
 
+  fun handleLeaveBattle() {
+    withConfirmation(context, message = "You will lose this battle") {
+      nav.popBackStack()
+    }
+  }
+
+  fun handleRestartBattle() {
+    withConfirmation(context, message = "You will lose your progress") {
+      // TODO:
+    }
+  }
+
+  fun handleColorChange() {
+    withConfirmation(context, message = "The game will restart and the progress will be lost") {
+      // TODO:
+    }
+  }
+
   ConfirmBackHandler(
     title = "Are you sure?",
     text = "You will lose this battle"
   ) {
     nav.popBackStack()
   }
+
+  OfflineDropdownMenu(actions = MenuActions.empty().copy(
+    onLeaveBattle = { handleLeaveBattle() },
+    onRestart = { handleRestartBattle() },
+    onColorChange = { handleColorChange() },
+  ))
 
   Column(
     modifier = Modifier
