@@ -81,7 +81,10 @@ fun OfflineDropdownMenu(actions: MenuActions = MenuActions.empty()) {
         menuItems(actions).map { menuItem ->
           DropdownMenuItem(
             text = { Text(menuItem.title) },
-            onClick = { menuItem.onClick() },
+            onClick = {
+              menuItem.onClick()
+              menuExpanded = false
+            },
             leadingIcon = {
               Icon(
                 menuItem.icon,

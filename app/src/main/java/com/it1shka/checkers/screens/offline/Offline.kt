@@ -51,7 +51,9 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
 
   val chessboardState = remember(state) {
     state.session.pieces.map { piece ->
-      val square = piece.square.value
+      val square = if(state.playerColor == PieceColor.BLACK)
+        piece.square.value
+        else piece.square.inverse.value
       val squareState = when {
         piece.type == PieceType.MAN && piece.color == PieceColor.BLACK ->
           SquareState.BLACK_MAN
@@ -73,13 +75,23 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
       .possibleMovesAt(pivot)
       .map { move -> move.to }
       .plus(pivot)
-      .map { it.value }
+      .map { square ->
+        if (state.playerColor == PieceColor.BLACK)
+          square.value
+          else square.inverse.value
+      }
   }
 
   fun squareClick(raw: Int) {
-    raw.asSquare?.let { square ->
-      viewModel.squareClick(square)
-    }
+    raw.asSquare
+      ?.let { square ->
+        if (state.playerColor == PieceColor.BLACK)
+          square
+          else square.inverse
+      }
+      ?.let { square ->
+        viewModel.squareClick(square)
+      }
   }
 
   val turnText = remember(state) {
@@ -114,13 +126,13 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
 
   fun handleRestartBattle() {
     withConfirmation(context, message = "You will lose your progress") {
-      // TODO:
+      viewModel.restart()
     }
   }
 
   fun handleColorChange() {
     withConfirmation(context, message = "The game will restart and the progress will be lost") {
-      // TODO:
+      viewModel.togglePlayerColor()
     }
   }
 

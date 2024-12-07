@@ -59,6 +59,28 @@ class OfflineViewModel : ViewModel() {
         playerColor = playerColor,
       )
     }
+    if (playerColor == PieceColor.RED) {
+      triggerBotResponseAsync()
+    }
+  }
+
+  fun togglePlayerColor() {
+    val currentColor = _state.value.playerColor
+    val nextColor = PieceColor.opposite(currentColor)
+    setPlayerColor(nextColor)
+  }
+
+  fun restart() {
+    _state.update { offlineState ->
+      offlineState.copy(
+        session = GameSession.new(),
+        pivotSquare = null,
+      )
+    }
+    val playerColor = _state.value.playerColor
+    if (playerColor == PieceColor.RED) {
+      triggerBotResponseAsync()
+    }
   }
 
   fun squareClick(clickedSquare: Square) {
@@ -90,9 +112,7 @@ class OfflineViewModel : ViewModel() {
                pivotSquare = null,
              )
            }
-           viewModelScope.launch(Dispatchers.Default) {
-             triggerBotResponse()
-           }
+           triggerBotResponseAsync()
          }
       }
 
@@ -103,6 +123,12 @@ class OfflineViewModel : ViewModel() {
           )
         }
       }
+    }
+  }
+
+  private fun triggerBotResponseAsync() {
+    viewModelScope.launch(Dispatchers.Default) {
+      triggerBotResponse()
     }
   }
 
