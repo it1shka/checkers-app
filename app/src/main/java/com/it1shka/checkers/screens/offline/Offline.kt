@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.it1shka.checkers.Preferences
@@ -33,10 +34,12 @@ import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
 import com.it1shka.checkers.gamelogic.asSquare
 import com.it1shka.checkers.screens.battle.BotDifficulty
+import kotlinx.coroutines.launch
 
 @Composable
 fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
   val state by viewModel.state.collectAsState()
 
@@ -47,6 +50,15 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   LaunchedEffect(botDifficulty) {
     val difficulty = BotDifficulty.valueOf(botDifficulty)
     viewModel.setDifficulty(difficulty)
+  }
+
+  val playerColor by Preferences
+    .getColor(context)
+    .collectAsState(PieceColor.BLACK.name)
+
+  LaunchedEffect(playerColor) {
+    val newPlayerColor = PieceColor.valueOf(playerColor)
+    viewModel.setPlayerColor(newPlayerColor)
   }
 
   val chessboardState = remember(state) {
@@ -132,7 +144,11 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
 
   fun handleColorChange() {
     withConfirmation(context, message = "The game will restart and the progress will be lost") {
-      viewModel.togglePlayerColor()
+      val previousColor = PieceColor.valueOf(playerColor)
+      val nextColor = PieceColor.opposite(previousColor)
+      coroutineScope.launch {
+        Preferences.saveColor(context, nextColor.name)
+      }
     }
   }
 
