@@ -1,6 +1,7 @@
 package com.it1shka.checkers.screens.offline
 
 import androidx.compose.foundation.layout.Arrangement
+import android.app.AlertDialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -128,6 +129,20 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
         "Draw (40 moves without capture)"
       else -> "Active"
     }
+  }
+
+  LaunchedEffect(statusText) {
+    if (state.session.status == GameStatus.ACTIVE) {
+      return@LaunchedEffect
+    }
+    AlertDialog.Builder(context)
+      .setTitle("Game Over")
+      .setMessage(statusText)
+      .setPositiveButton("Restart", { _, _ ->
+        viewModel.restart()
+      })
+      .setNegativeButton("OK", null)
+      .show()
   }
 
   fun handleLeaveBattle() {
