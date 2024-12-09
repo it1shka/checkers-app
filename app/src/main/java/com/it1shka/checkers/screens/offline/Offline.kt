@@ -138,9 +138,9 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
     AlertDialog.Builder(context)
       .setTitle("Game Over")
       .setMessage(statusText)
-      .setPositiveButton("Restart", { _, _ ->
+      .setPositiveButton("Restart") { _, _ ->
         viewModel.restart()
-      })
+      }
       .setNegativeButton("OK", null)
       .show()
   }
@@ -167,11 +167,13 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
     }
   }
 
-  ConfirmBackHandler(
-    title = "Are you sure?",
-    text = "You will lose this battle"
-  ) {
-    nav.popBackStack()
+  if (state.session.status == GameStatus.ACTIVE) {
+    ConfirmBackHandler(
+      title = "Are you sure?",
+      text = "You will lose this battle"
+    ) {
+      nav.popBackStack()
+    }
   }
 
   OfflineDropdownMenu(actions = MenuActions.empty().copy(
@@ -179,6 +181,11 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
     onRestart = { handleRestartBattle() },
     onColorChange = { handleColorChange() },
   ))
+
+  OfflineStatus(
+    title = "1:00",
+    subtitle = "Without capture: ${state.session.movesWithoutCapture}",
+  )
 
   Column(
     modifier = Modifier

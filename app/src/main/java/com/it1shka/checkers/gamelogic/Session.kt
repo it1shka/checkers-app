@@ -14,7 +14,7 @@ enum class GameStatus {
 data class GameSession(
   val board: Board,
   private val cache: Map<Board, Int>,
-  private val movesWithoutCapture: Int,
+  val movesWithoutCapture: Int,
   private val history: List<Pair<Board, GameStatus>>
 ) {
   companion object {
