@@ -33,12 +33,24 @@ data class AppRoute(
   val composable: @Composable () -> Unit
 )
 
-fun getRouting(navController: NavController) = listOf(
+data class AppRouteArgs(
+  val difficulty: String,
+  val color: String,
+)
+
+fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
   AppRoute(AppScreen.BATTLE, {
-    Battle(nav = navController)
+    Battle(
+      nav = navController,
+      initialDifficulty = args.difficulty,
+    )
   }),
   AppRoute(AppScreen.OFFLINE_BATTLE, {
-    Offline(nav = navController)
+    Offline(
+      nav = navController,
+      initialDifficulty = args.difficulty,
+      initialColor = args.color,
+    )
   }),
   AppRoute(AppScreen.ONLINE_BATTLE, {
     Column(modifier = Modifier.fillMaxSize()) {

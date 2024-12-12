@@ -24,12 +24,15 @@ import com.it1shka.checkers.app.AppScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun Battle(nav: NavController) {
+fun Battle(
+  nav: NavController,
+  initialDifficulty: String,
+) {
   val context = LocalContext.current
 
   val difficulty by Preferences
     .getDifficulty(context)
-    .collectAsState(BotDifficulty.NORMAL.name)
+    .collectAsState(initialDifficulty)
 
   val coroutineScope = rememberCoroutineScope()
   fun changeDifficulty(newDifficulty: BotDifficulty) {

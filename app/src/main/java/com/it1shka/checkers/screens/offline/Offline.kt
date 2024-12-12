@@ -43,6 +43,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun Offline(
   nav: NavController,
+  initialDifficulty: String,
+  initialColor: String,
   viewModel: OfflineViewModel = viewModel(),
   timerViewModel: TimerViewModel = viewModel(),
 ) {
@@ -68,7 +70,7 @@ fun Offline(
 
   val botDifficulty by Preferences
     .getDifficulty(context)
-    .collectAsState(BotDifficulty.NORMAL.name)
+    .collectAsState(initialDifficulty)
   LaunchedEffect(botDifficulty) {
     val difficulty = BotDifficulty.valueOf(botDifficulty)
     viewModel.setDifficulty(difficulty)
@@ -76,7 +78,7 @@ fun Offline(
 
   val playerColor by Preferences
     .getColor(context)
-    .collectAsState(PieceColor.BLACK.name)
+    .collectAsState(initialColor)
   LaunchedEffect(playerColor) {
     val newPlayerColor = PieceColor.valueOf(playerColor)
     viewModel.setPlayerColor(newPlayerColor)
