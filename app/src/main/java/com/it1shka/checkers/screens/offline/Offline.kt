@@ -50,7 +50,7 @@ fun Offline(
 ) {
   DisposableEffect(Unit) {
     onDispose {
-      viewModel.viewModelScope.cancel()
+      timerViewModel.stopTimer()
       timerViewModel.viewModelScope.cancel()
     }
   }

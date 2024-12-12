@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 const val TIMER_DELAY = 1000L
@@ -22,7 +23,7 @@ class TimerViewModel : ViewModel() {
     if (timerJob.value != null) return
     timerJob.value = viewModelScope.launch(Dispatchers.IO) {
       _timer.update { 0 }
-      while (true) {
+      while (isActive) {
         delay(TIMER_DELAY)
         _timer.update { it + 1 }
       }
