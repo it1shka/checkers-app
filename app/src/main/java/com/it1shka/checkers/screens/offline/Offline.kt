@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewModelScope
 import com.it1shka.checkers.Preferences
 import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
@@ -35,19 +37,38 @@ import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
 import com.it1shka.checkers.gamelogic.asSquare
 import com.it1shka.checkers.screens.battle.BotDifficulty
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 @Composable
-fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
+fun Offline(
+  nav: NavController,
+  viewModel: OfflineViewModel = viewModel(),
+  timerViewModel: TimerViewModel = viewModel(),
+) {
+  DisposableEffect(Unit) {
+    onDispose {
+      viewModel.viewModelScope.cancel()
+      timerViewModel.viewModelScope.cancel()
+    }
+  }
+
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
-  val state by viewModel.state.collectAsState()
+  val timer by timerViewModel.timer.collectAsState()
+  LaunchedEffect(Unit) {
+    timerViewModel.startTimer()
+  }
+  val prettyTimer = remember(timer) {
+    val minutes = (timer / 60).toString()
+    val seconds = (timer % 60).toString().padStart(2, '0')
+    "$minutes:$seconds"
+  }
 
   val botDifficulty by Preferences
     .getDifficulty(context)
     .collectAsState(BotDifficulty.NORMAL.name)
-
   LaunchedEffect(botDifficulty) {
     val difficulty = BotDifficulty.valueOf(botDifficulty)
     viewModel.setDifficulty(difficulty)
@@ -56,11 +77,13 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   val playerColor by Preferences
     .getColor(context)
     .collectAsState(PieceColor.BLACK.name)
-
   LaunchedEffect(playerColor) {
     val newPlayerColor = PieceColor.valueOf(playerColor)
     viewModel.setPlayerColor(newPlayerColor)
+    timerViewModel.restartTimer()
   }
+
+  val state by viewModel.state.collectAsState()
 
   val chessboardState = remember(state) {
     state.session.pieces.map { piece ->
@@ -154,6 +177,7 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   fun handleRestartBattle() {
     withConfirmation(context, message = "You will lose your progress") {
       viewModel.restart()
+      timerViewModel.restartTimer()
     }
   }
 
@@ -183,7 +207,7 @@ fun Offline(nav: NavController, viewModel: OfflineViewModel = viewModel()) {
   ))
 
   OfflineStatus(
-    title = "1:00",
+    title = prettyTimer,
     subtitle = "Without capture: ${state.session.movesWithoutCapture}",
   )
 

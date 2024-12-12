@@ -46,7 +46,7 @@ class OfflineViewModel : ViewModel() {
         BotDifficulty.EASY -> BotRandom()
         BotDifficulty.NORMAL -> BotMinimax(MinimaxConfigs.normal)
         BotDifficulty.HARD -> BotMinimax(MinimaxConfigs.intermediate)
-        else -> BotMinimax(MinimaxConfigs.proficient)
+        else -> BotMinimax(MinimaxConfigs.strong)
       }
       offlineState.copy(bot = newBot)
     }
