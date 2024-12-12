@@ -2,6 +2,7 @@ package com.it1shka.checkers
 
 import com.it1shka.checkers.gamelogic.Board
 import com.it1shka.checkers.gamelogic.BoardMove
+import com.it1shka.checkers.gamelogic.BotRandom
 import com.it1shka.checkers.gamelogic.Piece
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
@@ -59,6 +60,36 @@ class BoardTest {
       val actual = board.pieceAt(Square(square))
       assertEquals(expected, actual)
     }
+  }
+
+  @Test
+  fun `hashCode for equal boards should be equal`() {
+    val board1 = Board.new()
+    val board2 = Board.new()
+    assertTrue(board1.hashCode() == board2.hashCode())
+  }
+
+  @Test
+  fun `testing hashCode for random moves`() {
+    var board1 = Board.new()
+    var board2 = Board.new()
+    var bot = BotRandom()
+    run iterations@ {
+      repeat(1000) {
+        val move = bot.findMove(board1)
+        if (move == null) return@iterations
+        board1 = board1.makeMove(move)!!
+        board2 = board2.makeMove(move)!!
+        assertTrue(board1.hashCode() == board2.hashCode())
+      }
+    }
+  }
+
+  @Test
+  fun `hashCode should be different for different board`() {
+    val board1 = Board.new()
+    val board2 = Board.new().makeMove(BoardMove(Square(1) to Square(6)))
+    assertFalse(board1.hashCode() == board2.hashCode())
   }
 }
 

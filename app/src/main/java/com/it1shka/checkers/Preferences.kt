@@ -16,6 +16,7 @@ private val Context.dataStore by preferencesDataStore(
 
 object Preferences {
   private val DIFFICULTY_KEY = stringPreferencesKey("difficulty")
+  private val COLOR_KEY = stringPreferencesKey("color")
 
   suspend fun saveDifficulty(context: Context, difficulty: String) {
     context.dataStore.edit { storage ->
@@ -26,6 +27,18 @@ object Preferences {
   fun getDifficulty(context: Context): Flow<String> {
     return context.dataStore.data
       .map { storage -> storage[DIFFICULTY_KEY] }
+      .filterNotNull()
+  }
+
+  suspend fun saveColor(context: Context, color: String) {
+    context.dataStore.edit { storage ->
+      storage[COLOR_KEY] = color
+    }
+  }
+
+  fun getColor(context: Context): Flow<String> {
+    return context.dataStore.data
+      .map { storage -> storage[COLOR_KEY] }
       .filterNotNull()
   }
 }

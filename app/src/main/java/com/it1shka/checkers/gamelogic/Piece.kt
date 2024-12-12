@@ -34,6 +34,9 @@ value class Square(private val square: Int) {
       }
       return Position(row to column)
     }
+
+  val inverse: Square
+    get() = Square(PieceConstants.SQUARE_END - square + 1)
 }
 
 val Int.asSquare: Square?
