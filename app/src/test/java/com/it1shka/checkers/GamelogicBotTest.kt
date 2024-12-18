@@ -56,7 +56,7 @@ class BotTest {
   @Test
   fun `testing the bot accuracy and performance`() {
     var board = Board.new()
-    val botAdvanced = BotMinimax(MinimaxConfigs.strong)
+    val botAdvanced = BotMinimax(MinimaxConfigs.proficient)
     val botDefault = BotRandom()
     var index = 0
     while (!board.possibleMoves.isEmpty()) {
