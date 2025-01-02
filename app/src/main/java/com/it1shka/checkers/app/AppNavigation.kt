@@ -34,6 +34,9 @@ data class AppRoute(
 data class AppRouteArgs(
   val difficulty: String,
   val color: String,
+  val nickname: String,
+  val rating: Int,
+  val region: String,
 )
 
 fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
@@ -62,7 +65,9 @@ fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
   }),
   AppRoute(AppScreen.PROFILE, {
     Profile(
-      // TODO: pass some initial values
+      initialNickname = args.nickname,
+      initialRating = args.rating,
+      initialRegion = args.region,
     )
   })
 )
