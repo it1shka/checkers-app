@@ -67,10 +67,6 @@ fun Profile(
     tempNickname = generateNickname()
   }
 
-  fun useCurrentRegion() {
-    // TODO: enable
-  }
-
   val coroutineScope = rememberCoroutineScope()
   fun applyChanges() {
     coroutineScope.launch {
@@ -162,6 +158,7 @@ fun Profile(
           style = MaterialTheme.typography.headlineSmall,
         )
         TextField(
+          singleLine = true,
           modifier = Modifier.fillMaxWidth(),
           value = tempNickname,
           onValueChange = { tempNickname = it },
@@ -170,6 +167,7 @@ fun Profile(
           }
         )
         TextField(
+          singleLine = true,
           modifier = Modifier.fillMaxWidth(),
           value = tempRegion,
           onValueChange = { tempRegion = it },
@@ -186,9 +184,6 @@ fun Profile(
         ) {
           TextButton(onClick = ::randomizeNickname) {
             Text("Randomize Nickname")
-          }
-          TextButton(onClick = ::useCurrentRegion) {
-            Text("Use Current Region")
           }
         }
       }
