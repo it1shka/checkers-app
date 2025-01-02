@@ -1,5 +1,7 @@
 package com.it1shka.checkers.gamelogic
 
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
 
 interface CheckersBot {
@@ -53,6 +55,7 @@ data class BotMinimaxConfig(
   val centerBonus: Double,
   val edgeBonus: Double,
   val backRankBonus: Double,
+  val optimized: Boolean,
 ) {
   companion object {
     val default: BotMinimaxConfig
@@ -65,6 +68,7 @@ data class BotMinimaxConfig(
         centerBonus = 0.25,
         edgeBonus = 0.25,
         backRankBonus = 0.5,
+        optimized = true,
       )
   }
 }
@@ -100,14 +104,24 @@ class BotMinimax(private val config: BotMinimaxConfig = BotMinimaxConfig.default
     return moves.maxBy { move ->
       val nextBoard = board.makeMove(move)
       if (nextBoard == null) Double.NEGATIVE_INFINITY
-      else minimax(
-        board = nextBoard,
-        depth = config.depth,
-        maximizing = board.turn,
+      else (
+        if (config.optimized) minimaxOptimized(
+          board = nextBoard,
+          depth = config.depth,
+          maximizing = board.turn,
+          alpha = Double.NEGATIVE_INFINITY,
+          beta = Double.POSITIVE_INFINITY,
+        )
+        else minimax(
+          board = nextBoard,
+          depth = config.depth,
+          maximizing = board.turn,
+        )
       )
     }
   }
 
+  /* Classical version without alpha-beta pruning */
   private fun minimax(board: Board, depth: Int, maximizing: PieceColor): Double {
     if (depth <= 0) {
       return evaluateBoard(board, maximizing)
@@ -126,6 +140,55 @@ class BotMinimax(private val config: BotMinimaxConfig = BotMinimaxConfig.default
     return if (board.turn == maximizing)
       scores.max()
     else scores.min()
+  }
+
+  /* Faster version with alpha-beta pruning */
+  private fun minimaxOptimized(
+    board: Board,
+    depth: Int,
+    maximizing: PieceColor,
+    alpha: Double,
+    beta: Double,
+  ): Double {
+    if (depth <= 0) {
+      return evaluateBoard(board, maximizing)
+    }
+
+    val moves = board.possibleMoves
+    if (moves.isEmpty()) {
+      return evaluateBoard(board, maximizing)
+    }
+
+    val isMaximizing = maximizing == board.turn
+
+    var runningAlpha = alpha
+    var runningBeta = beta
+    var score = if (isMaximizing)
+      Double.NEGATIVE_INFINITY
+      else Double.POSITIVE_INFINITY
+
+    for (move in moves) {
+      val nextBoard = board.makeMove(move)
+      if (nextBoard == null) continue
+      val currentScore = minimaxOptimized(
+        board = nextBoard,
+        depth = depth - 1,
+        maximizing = maximizing,
+        alpha = runningAlpha,
+        beta = runningBeta,
+      )
+      score = if (isMaximizing)
+        max(score, currentScore)
+        else min(score, currentScore)
+      if (isMaximizing) {
+        if (score >= runningBeta) return score
+        runningAlpha = max(runningAlpha, score)
+      } else {
+        if (score <= runningAlpha) return score
+        runningBeta = min(runningBeta, score)
+      }
+    }
+    return score
   }
 
   private fun evaluateBoard(board: Board, color: PieceColor): Double {
