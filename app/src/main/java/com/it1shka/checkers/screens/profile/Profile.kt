@@ -1,5 +1,6 @@
 package com.it1shka.checkers.screens.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,6 +75,9 @@ fun Profile(
       Preferences.saveRegion(context, tempRegion)
       isEditing = false
     }
+    Toast
+      .makeText(context, "Changes applied", Toast.LENGTH_SHORT)
+      .show()
   }
 
   Row(
