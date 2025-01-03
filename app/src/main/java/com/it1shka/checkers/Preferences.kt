@@ -50,6 +50,12 @@ object Preferences {
 
   val saveRating = saveItem(RATING_KEY)
   val getRating = getItem(RATING_KEY)
+  suspend fun incrementRating(ctx: Context) {
+    ctx.dataStore.edit { storage ->
+      val prev = storage[RATING_KEY]
+      storage[RATING_KEY] = (prev ?: 0) + 1
+    }
+  }
 
   val saveRegion = saveItem(REGION_KEY)
   val getRegion = getItem(REGION_KEY)

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.offline.Offline
+import com.it1shka.checkers.screens.online.Online
 import com.it1shka.checkers.screens.profile.Profile
 
 enum class AppScreen {
@@ -54,9 +55,9 @@ fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
     )
   }),
   AppRoute(AppScreen.ONLINE_BATTLE, {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text("TODO: ")
-    }
+    Online(
+      // TODO: inject dependencies
+    )
   }),
   AppRoute(AppScreen.HISTORY, {
     Column(modifier = Modifier.fillMaxSize()) {
