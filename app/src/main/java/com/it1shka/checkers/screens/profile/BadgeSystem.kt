@@ -1,41 +1,55 @@
 package com.it1shka.checkers.screens.profile
 
-private val badges = mapOf(
-  0 to "Newborn",
-  10 to "Novice",
-  25 to "Novice+",
-  50 to "Medium",
-  100 to "Medium+",
-  150 to "Advanced",
-  200 to "Advanced+",
-  250 to "Master",
-  300 to "Master+",
-  500 to "Grandmaster",
-  1000 to "Champion",
-  2000 to "Absolute Champion",
-  5000 to "Legendary Champion",
+import androidx.compose.ui.graphics.Color
+
+data class Badge(
+  val ranking: Int,
+  val color: Color,
+  val name: String
 )
 
-fun getBadge(score: Int): Pair<Int, String> {
-  val sortedBadges = badges
-    .toList()
-    .sortedByDescending { it.first }
-  for (pair in sortedBadges) {
-    if (score >= pair.first) {
-      return pair
+private val badges = listOf(
+  Badge(0, Color(0xff303030), "Newborn"),
+  Badge(10, Color(0xff525252), "Novice"),
+  Badge(25, Color(0xff789a9c), "Novice+"),
+  Badge(50, Color(0xff55cacf), "Medium"),
+  Badge(100, Color(0xff2b67cf), "Medium+"),
+  Badge(150, Color(0xff782bcf), "Advanced"),
+  Badge(200, Color(0xff982bcf), "Advanced+"),
+  Badge(250, Color(0xffcf852b), "Master"),
+  Badge(300, Color(0xffcf572b), "Master+"),
+  Badge(500, Color(0xffcf2b2b), "Grandmaster"),
+  Badge(1000, Color(0xff2bcf4f), "Champion"),
+  Badge(2000, Color(0xff2bcf7a), "Absolute Champion"),
+  Badge(5000, Color(0xffcf557b), "Legend")
+)
+
+fun getCurrentBadge(score: Int): Badge {
+  for (badge in badges.sortedByDescending { it.ranking }) {
+    if (score >= badge.ranking) {
+      return badge
     }
   }
-  return sortedBadges.last()
+  return badges.first()
 }
 
-fun getNextBadge(score: Int): Pair<Int, String>? {
-  val sortedBadges = badges
-    .toList()
-    .sortedBy { it.first }
-  for (pair in sortedBadges) {
-    if (score < pair.first) {
-      return pair
+fun getNextBadge(score: Int): Badge? {
+  for (badge in badges.sortedBy { it.ranking }) {
+    if (score < badge.ranking) {
+      return badge
     }
   }
   return null
+}
+
+fun getCompletedBadges(score: Int): List<Badge> {
+  return badges.filter { badge ->
+    score >= badge.ranking
+  }.sortedBy { it.ranking }
+}
+
+fun getFutureBadges(score: Int): List<Badge> {
+  return badges.filter { badge ->
+    score < badge.ranking
+  }.sortedBy { it.ranking }
 }

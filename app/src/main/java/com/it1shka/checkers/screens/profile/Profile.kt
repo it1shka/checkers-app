@@ -156,7 +156,7 @@ fun Profile(
             style = MaterialTheme.typography.headlineSmall,
           )
         }
-        Badge(rating)
+        BadgeElement(rating)
       } else {
         Text(
           text = "Change to:",
