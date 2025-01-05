@@ -39,9 +39,24 @@ fun App() {
     .getColor(context)
     .collectAsState(PieceColor.BLACK.name)
 
+  val nickname by Preferences
+    .getNickname(context)
+    .collectAsState("AnonymousPlayer")
+
+  val rating by Preferences
+    .getRating(context)
+    .collectAsState(0)
+
+  val region by Preferences
+    .getRegion(context)
+    .collectAsState("Unknown")
+
   val routes = getRouting(navController, AppRouteArgs(
     difficulty = botDifficulty,
     color = playerColor,
+    nickname = nickname,
+    rating = rating,
+    region = region,
   ))
 
   MaterialTheme {

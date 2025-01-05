@@ -6,11 +6,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,12 +16,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.offline.Offline
+import com.it1shka.checkers.screens.online.Online
+import com.it1shka.checkers.screens.profile.Profile
 
 enum class AppScreen {
   BATTLE,
   OFFLINE_BATTLE,
   ONLINE_BATTLE,
-  HALL_OF_FAME,
   HISTORY,
   PROFILE,
 }
@@ -36,6 +35,9 @@ data class AppRoute(
 data class AppRouteArgs(
   val difficulty: String,
   val color: String,
+  val nickname: String,
+  val rating: Int,
+  val region: String,
 )
 
 fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
@@ -53,14 +55,9 @@ fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
     )
   }),
   AppRoute(AppScreen.ONLINE_BATTLE, {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text("TODO: ")
-    }
-  }),
-  AppRoute(AppScreen.HALL_OF_FAME, {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text("TODO: ")
-    }
+    Online(
+      // TODO: inject dependencies
+    )
   }),
   AppRoute(AppScreen.HISTORY, {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -68,9 +65,11 @@ fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
     }
   }),
   AppRoute(AppScreen.PROFILE, {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text("TODO: ")
-    }
+    Profile(
+      initialNickname = args.nickname,
+      initialRating = args.rating,
+      initialRegion = args.region,
+    )
   })
 )
 
@@ -87,12 +86,6 @@ val navbarItems = listOf(
     title = "Battle",
     selectedIcon = Icons.Filled.Star,
     regularIcon = Icons.Outlined.Star,
-  ),
-  NavbarItem(
-    screen = AppScreen.HALL_OF_FAME,
-    title = "Hall of Fame",
-    selectedIcon = Icons.Filled.ThumbUp,
-    regularIcon = Icons.Outlined.ThumbUp,
   ),
   NavbarItem(
     screen = AppScreen.HISTORY,
