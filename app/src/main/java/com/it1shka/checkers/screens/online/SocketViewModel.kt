@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -26,6 +25,7 @@ enum class SocketState {
 }
 
 class SocketViewModel : ViewModel() {
+  private val SOCKET_SCHEME = BuildConfig.SOCKET_SCHEME
   private val SOCKET_HOST = BuildConfig.SOCKET_HOST
   private val SOCKET_PORT = BuildConfig.SOCKET_PORT
 
@@ -39,13 +39,8 @@ class SocketViewModel : ViewModel() {
   val incomingMessage = _incomingMessages.receiveAsFlow()
 
   private fun getSocketRequest(player: PlayerInfo): Request {
-    val url = HttpUrl.Builder()
-      .host(SOCKET_HOST)
-      .port(SOCKET_PORT)
-      .addQueryParameter("nickname", player.nickname)
-      .addQueryParameter("rating", player.rating.toString())
-      .addQueryParameter("region", player.region)
-      .build()
+    // https://github.com/square/okhttp/issues/4035
+    val url = "$SOCKET_SCHEME://$SOCKET_HOST:$SOCKET_PORT/ws-connect?nickname=${player.nickname}&rating=${player.rating}&region=${player.region}"
     val request = Request.Builder()
       .url(url)
       .build()
@@ -53,20 +48,30 @@ class SocketViewModel : ViewModel() {
   }
 
   fun initSocket(player: PlayerInfo) {
-    if (socket != null) closeSocket()
-    val request = getSocketRequest(player)
-    socket = client.newWebSocket(request, object : WebSocketListener() {
-      override fun onOpen(webSocket: WebSocket, response: Response) =
-        onSocketOpen(webSocket, response)
-      override fun onClosed(webSocket: WebSocket, code: Int, reason: String) =
-        onSocketClosed(webSocket, code, reason)
-      override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) =
-        onSocketFailure(webSocket, t, response)
-      override fun onMessage(webSocket: WebSocket, bytes: ByteString) =
-        onSocketMessage(webSocket, bytes)
-      override fun onMessage(webSocket: WebSocket, text: String) =
-        onSocketMessage(webSocket, text)
-    })
+    try {
+      if (socket != null) closeSocket()
+      val request = getSocketRequest(player)
+      socket = client.newWebSocket(request, object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) =
+          onSocketOpen(webSocket, response)
+
+        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) =
+          onSocketClosed(webSocket, code, reason)
+
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) =
+          onSocketFailure(webSocket, t, response)
+
+        override fun onMessage(webSocket: WebSocket, bytes: ByteString) =
+          onSocketMessage(webSocket, bytes)
+
+        override fun onMessage(webSocket: WebSocket, text: String) =
+          onSocketMessage(webSocket, text)
+      })
+    } catch (e: Exception) {
+      Log.e("Websocket Failure", e.message ?: "no message")
+      socket = null
+      _socketState.value = SocketState.CLOSED
+    }
   }
 
   private fun onSocketOpen(webSocket: WebSocket, response: Response) {
@@ -79,7 +84,9 @@ class SocketViewModel : ViewModel() {
 
   private fun onSocketFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
     val message = response?.message ?: "no message"
-    Log.e("WebSocket Failure", "Failure occurred: $message")
+    val failure = t.message ?: "no message"
+    Log.e("WebSocket Failure", "Response: $message")
+    Log.e("WebSocket Failure", "Failure: $failure")
   }
 
   private fun onSocketMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -107,7 +114,7 @@ class SocketViewModel : ViewModel() {
     socket?.send(message)
   }
 
-  private fun closeSocket() {
+  fun closeSocket() {
     socket?.close(
       code = 1000,
       reason = "client closed the connection",

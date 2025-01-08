@@ -3,6 +3,7 @@ package com.it1shka.checkers.screens.online
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -13,6 +14,7 @@ import com.it1shka.checkers.screens.online.records.IncomingMessage
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import com.it1shka.checkers.components.ConfirmBackHandler
+import com.it1shka.checkers.screens.online.records.PlayerInfo
 
 @Composable
 fun Online(
@@ -22,6 +24,19 @@ fun Online(
   socketViewModel: SocketViewModel = viewModel(),
   mainViewModel: OnlineViewModel = viewModel(),
 ) {
+  DisposableEffect(nickname, rating, region) {
+    socketViewModel.initSocket(PlayerInfo(
+      nickname = nickname,
+      rating = rating,
+      region = region,
+    ))
+    onDispose {
+      socketViewModel.closeSocket()
+      mainViewModel.leaveBattle()
+      mainViewModel.leaveQueue()
+    }
+  }
+
   val coroutineScope = rememberCoroutineScope()
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -87,7 +102,13 @@ fun Online(
 
   when (screenState) {
     OnlineState.IN_MENU -> {
-      // TODO:
+      BattleMenu(
+        nickname = nickname,
+        rating = rating,
+        region = region,
+        connected = socketState == SocketState.OPEN,
+        // TODO:
+      )
     }
     OnlineState.IN_QUEUE -> {
       ConfirmBackHandler(

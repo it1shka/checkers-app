@@ -20,7 +20,8 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "SOCKET_HOST", "\"ws://localhost\"")
+            buildConfigField("String", "SOCKET_SCHEME", "\"ws\"")
+            buildConfigField("String", "SOCKET_HOST", "\"10.0.2.2\"")
             buildConfigField("int", "SOCKET_PORT", "3056")
         }
         release {
