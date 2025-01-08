@@ -19,6 +19,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "SOCKET_HOST", "\"ws://localhost\"")
+            buildConfigField("int", "SOCKET_PORT", "3056")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -27,14 +31,18 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -51,6 +59,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
+  implementation(libs.okhttp)
+    implementation(libs.org.jetbrains.kotlin.plugin.serialization.gradle.plugin)
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
