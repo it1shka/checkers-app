@@ -3,11 +3,14 @@ package com.it1shka.checkers.screens.online
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.it1shka.checkers.BuildConfig
+import com.it1shka.checkers.screens.online.records.IncomingMessage
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -32,7 +35,7 @@ class SocketViewModel : ViewModel() {
   private val _socketState = MutableStateFlow(SocketState.CLOSED)
   val socketState = _socketState.asStateFlow()
 
-  private val _incomingMessages = Channel<String>()
+  private val _incomingMessages = Channel<IncomingMessage>()
   val incomingMessage = _incomingMessages.receiveAsFlow()
 
   private fun getSocketRequest(player: PlayerInfo): Request {
@@ -85,7 +88,16 @@ class SocketViewModel : ViewModel() {
   }
 
   private fun onSocketMessage(webSocket: WebSocket, text: String) {
-    _incomingMessages.trySend(text)
+    try {
+      Json { ignoreUnknownKeys = true }
+        .decodeFromString<IncomingMessage>(text)
+        .let { msg ->
+          _incomingMessages.trySend(msg)
+        }
+    } catch (e: SerializationException) {
+      val message = e.message ?: "no message"
+      Log.e("Websocket Malformed JSON", message)
+    }
   }
 
   fun sendMessage(message: String) {

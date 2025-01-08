@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonClassDiscriminator
 @OptIn(ExperimentalSerializationApi::class)
 @JsonClassDiscriminator("type")
 sealed class IncomingMessage {
-
+  // messages with payload
   @Serializable
   @SerialName("enemy")
   data class Enemy(
@@ -42,6 +42,16 @@ sealed class IncomingMessage {
   @SerialName("time")
   data class Time(
     @SerialName("payload")
-    val payload: Time,
+    val payload: TimePayload,
   ) : IncomingMessage()
+
+  // messages without payload,
+  // used just as notifications
+  @Serializable
+  @SerialName("queue-joined")
+  class QueueJoined : IncomingMessage()
+
+  @Serializable
+  @SerialName("queue-left")
+  class QueueLeft : IncomingMessage()
 }
