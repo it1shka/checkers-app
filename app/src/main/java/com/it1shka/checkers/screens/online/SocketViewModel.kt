@@ -1,0 +1,110 @@
+package com.it1shka.checkers.screens.online
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import com.it1shka.checkers.BuildConfig
+import com.it1shka.checkers.screens.online.records.PlayerInfo
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
+import java.nio.charset.StandardCharsets
+
+enum class SocketState {
+  CLOSED,
+  OPEN,
+}
+
+class SocketViewModel : ViewModel() {
+  private val SOCKET_HOST = BuildConfig.SOCKET_HOST
+  private val SOCKET_PORT = BuildConfig.SOCKET_PORT
+
+  private val client = OkHttpClient()
+  private var socket: WebSocket? = null
+
+  private val _socketState = MutableStateFlow(SocketState.CLOSED)
+  val socketState = _socketState.asStateFlow()
+
+  private val _incomingMessages = Channel<String>()
+  val incomingMessage = _incomingMessages.receiveAsFlow()
+
+  private fun getSocketRequest(player: PlayerInfo): Request {
+    val url = HttpUrl.Builder()
+      .host(SOCKET_HOST)
+      .port(SOCKET_PORT)
+      .addQueryParameter("nickname", player.nickname)
+      .addQueryParameter("rating", player.rating.toString())
+      .addQueryParameter("region", player.region)
+      .build()
+    val request = Request.Builder()
+      .url(url)
+      .build()
+    return request
+  }
+
+  fun initSocket(player: PlayerInfo) {
+    if (socket != null) closeSocket()
+    val request = getSocketRequest(player)
+    socket = client.newWebSocket(request, object : WebSocketListener() {
+      override fun onOpen(webSocket: WebSocket, response: Response) =
+        onSocketOpen(webSocket, response)
+      override fun onClosed(webSocket: WebSocket, code: Int, reason: String) =
+        onSocketClosed(webSocket, code, reason)
+      override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) =
+        onSocketFailure(webSocket, t, response)
+      override fun onMessage(webSocket: WebSocket, bytes: ByteString) =
+        onSocketMessage(webSocket, bytes)
+      override fun onMessage(webSocket: WebSocket, text: String) =
+        onSocketMessage(webSocket, text)
+    })
+  }
+
+  private fun onSocketOpen(webSocket: WebSocket, response: Response) {
+    _socketState.value = SocketState.OPEN
+  }
+
+  private fun onSocketClosed(webSocket: WebSocket, code: Int, reason: String) {
+    _socketState.value = SocketState.CLOSED
+  }
+
+  private fun onSocketFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+    val message = response?.message ?: "no message"
+    Log.e("WebSocket Failure", "Failure occurred: $message")
+  }
+
+  private fun onSocketMessage(webSocket: WebSocket, bytes: ByteString) {
+    webSocket.send("client does not support binary messages")
+    Log.e("WebSocket Weird Message", bytes.string(StandardCharsets.UTF_8))
+  }
+
+  private fun onSocketMessage(webSocket: WebSocket, text: String) {
+    _incomingMessages.trySend(text)
+  }
+
+  fun sendMessage(message: String) {
+    if (_socketState.value == SocketState.CLOSED) {
+      return
+    }
+    socket?.send(message)
+  }
+
+  private fun closeSocket() {
+    socket?.close(
+      code = 1000,
+      reason = "client closed the connection",
+    )
+    socket = null
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    closeSocket()
+  }
+}
