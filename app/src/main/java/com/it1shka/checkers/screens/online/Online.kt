@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.it1shka.checkers.components.ConfirmBackHandler
+import com.it1shka.checkers.screens.online.records.OutcomingMessage
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 
 @Composable
@@ -103,7 +104,9 @@ fun Online(
   }
 
   fun joinQueue() {
-    // TODO:
+    socketViewModel.sendMessage(
+      OutcomingMessage.Join()
+    )
   }
 
   val socketState by socketViewModel.socketState.collectAsState()

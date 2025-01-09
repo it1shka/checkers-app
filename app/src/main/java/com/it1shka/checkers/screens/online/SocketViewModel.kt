@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.it1shka.checkers.BuildConfig
 import com.it1shka.checkers.screens.online.records.IncomingMessage
+import com.it1shka.checkers.screens.online.records.OutcomingMessage
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -107,11 +108,19 @@ class SocketViewModel : ViewModel() {
     }
   }
 
-  fun sendMessage(message: String) {
+  fun sendMessage(message: OutcomingMessage) {
     if (_socketState.value == SocketState.CLOSED) {
       return
     }
-    socket?.send(message)
+    socket?.let { ws ->
+      try {
+        val preparedMessage = Json.encodeToString(message)
+        ws.send(preparedMessage)
+      } catch (e: Exception) {
+        val message = e.message ?: "no message"
+        Log.e("Websocket Send Failure", message)
+      }
+    }
   }
 
   fun closeSocket() {
