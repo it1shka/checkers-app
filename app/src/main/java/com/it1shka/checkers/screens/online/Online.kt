@@ -102,6 +102,10 @@ fun Online(
     }
   }
 
+  fun joinQueue() {
+    // TODO:
+  }
+
   val socketState by socketViewModel.socketState.collectAsState()
   val screenState by mainViewModel.state.collectAsState()
 
@@ -113,7 +117,8 @@ fun Online(
         rating = rating,
         region = region,
         connected = socketState == SocketState.OPEN,
-        onReconnect = ::connectWebsocket
+        onReconnect = ::connectWebsocket,
+        onQueueJoin = ::joinQueue,
       )
     }
     OnlineState.IN_QUEUE -> {

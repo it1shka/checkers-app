@@ -4,10 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -29,6 +34,7 @@ fun BattleMenu(
   region: String,
   connected: Boolean,
   onReconnect: () -> Unit,
+  onQueueJoin: () -> Unit,
 ) {
   fun navigateToMenu() {
     nav.popBackStack()
@@ -88,13 +94,73 @@ fun BattleMenu(
     Column(
       modifier = Modifier
         .fillMaxSize()
-        .padding(16.dp),
+        .padding(20.dp),
+      horizontalAlignment = Alignment.Start,
+      verticalArrangement = Arrangement.Center,
     ) {
+      Text(
+        text = "Your profile:",
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier
+          .padding(vertical = 16.dp),
+      )
       Column(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+          .fillMaxWidth(),
       ) {
-
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          Icon(Icons.Default.Person, contentDescription = "Nickname")
+          Text(
+            text = if (nickname.isEmpty()) "Unknown" else nickname,
+            style = MaterialTheme.typography.headlineLarge,
+          )
+        }
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          Icon(Icons.Default.Star, contentDescription = "Wins")
+          Text(
+            text = "$rating online win(s)",
+            style = MaterialTheme.typography.headlineSmall,
+          )
+        }
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          Icon(Icons.Default.LocationOn, contentDescription = "Region")
+          val regionString =
+            if (region.isEmpty()) "unknown"
+            else region
+          Text(
+            text = "Region: $regionString",
+            style = MaterialTheme.typography.headlineSmall,
+          )
+        }
+      }
+      Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+          .padding(vertical = 32.dp)
+          .fillMaxWidth()
+      ) {
+        Button(
+          onClick = { onQueueJoin() },
+          modifier = Modifier.scale(1.25f)
+        ) {
+          Icon(
+            Icons.Default.PlayArrow,
+            contentDescription = "Join Queue",
+            modifier = Modifier.scale(1.25f),
+          )
+        }
       }
     }
   }
