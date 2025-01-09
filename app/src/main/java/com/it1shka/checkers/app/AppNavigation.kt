@@ -56,6 +56,7 @@ fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
   }),
   AppRoute(AppScreen.ONLINE_BATTLE, {
     Online(
+      nav = navController,
       nickname = args.nickname,
       rating = args.rating,
       region = args.region,

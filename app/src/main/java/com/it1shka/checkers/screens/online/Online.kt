@@ -1,7 +1,6 @@
 package com.it1shka.checkers.screens.online
 
 import android.util.Log
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,23 +12,29 @@ import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.screens.online.records.IncomingMessage
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 
 @Composable
 fun Online(
+  nav: NavController,
   nickname: String,
   rating: Int,
   region: String,
   socketViewModel: SocketViewModel = viewModel(),
   mainViewModel: OnlineViewModel = viewModel(),
 ) {
-  DisposableEffect(nickname, rating, region) {
+  fun connectWebsocket() {
     socketViewModel.initSocket(PlayerInfo(
       nickname = nickname,
       rating = rating,
       region = region,
     ))
+  }
+
+  DisposableEffect(nickname, rating, region) {
+    connectWebsocket()
     onDispose {
       socketViewModel.closeSocket()
       mainViewModel.leaveBattle()
@@ -103,11 +108,12 @@ fun Online(
   when (screenState) {
     OnlineState.IN_MENU -> {
       BattleMenu(
+        nav = nav,
         nickname = nickname,
         rating = rating,
         region = region,
         connected = socketState == SocketState.OPEN,
-        // TODO:
+        onReconnect = ::connectWebsocket
       )
     }
     OnlineState.IN_QUEUE -> {
