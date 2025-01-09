@@ -12,6 +12,7 @@ import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.screens.online.records.IncomingMessage
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.screens.online.records.OutcomingMessage
@@ -26,12 +27,16 @@ fun Online(
   socketViewModel: SocketViewModel = viewModel(),
   mainViewModel: OnlineViewModel = viewModel(),
 ) {
-  fun connectWebsocket() {
-    socketViewModel.initSocket(PlayerInfo(
+  val player = remember(nickname, rating, region) {
+    PlayerInfo(
       nickname = nickname,
       rating = rating,
       region = region,
-    ))
+    )
+  }
+
+  fun connectWebsocket() {
+    socketViewModel.initSocket(player)
   }
 
   DisposableEffect(nickname, rating, region) {
@@ -112,6 +117,14 @@ fun Online(
   val socketState by socketViewModel.socketState.collectAsState()
   val screenState by mainViewModel.state.collectAsState()
 
+  val enemy by mainViewModel.enemy.collectAsState()
+  val playerColor by mainViewModel.color.collectAsState()
+  val playerTime by mainViewModel.playerTime.collectAsState()
+  val enemyTime by mainViewModel.enemyTime.collectAsState()
+  val gameStatus by mainViewModel.gameStatus.collectAsState()
+  val boardState by mainViewModel.boardState.collectAsState()
+  val turn by mainViewModel.turn.collectAsState()
+
   when (screenState) {
     OnlineState.IN_MENU -> {
       BattleMenu(
@@ -138,9 +151,22 @@ fun Online(
         title = "Quitting battle",
         text = "Are you sure? You will lose this battle",
       ) {
-        // TODO:
+        socketViewModel.sendMessage(
+          OutcomingMessage.Leave()
+        )
+        mainViewModel.leaveBattle()
       }
-      // TODO:
+      OnlineBattle(
+        nav = nav,
+        player = player,
+        enemy = enemy,
+        playerColor = playerColor,
+        playerTime = playerTime,
+        enemyTime = enemyTime,
+        gameStatus = gameStatus,
+        boardState = boardState,
+        turn = turn,
+      )
     }
   }
 }
