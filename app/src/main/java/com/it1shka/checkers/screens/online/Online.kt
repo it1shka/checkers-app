@@ -209,7 +209,8 @@ fun Online(
         boardState = boardState,
         turn = turn,
         onMove = ::move,
-        onBattleLeave = ::leaveBattleWithConfirmation
+        onBattleLeave = ::leaveBattleWithConfirmation,
+        onPlayAgain = ::joinQueue,
       )
     }
   }

@@ -1,5 +1,6 @@
 package com.it1shka.checkers.screens.online
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import com.it1shka.checkers.gamelogic.asSquare
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 
 private const val LOADING = "Loading..."
 
@@ -42,7 +45,8 @@ fun OnlineBattle(
   boardState: List<Pair<Int, SquareState>>?,
   turn: PieceColor?,
   onMove: (from: Int, to: Int) -> Unit,
-  onBattleLeave: () -> Unit
+  onBattleLeave: () -> Unit,
+  onPlayAgain: () -> Unit,
 ) {
   val pieces = remember(playerColor, boardState) {
     if (playerColor == PieceColor.BLACK) return@remember boardState
@@ -184,6 +188,50 @@ fun OnlineBattle(
           style = MaterialTheme.typography.headlineSmall,
           color = MaterialTheme.colorScheme.secondary,
         )
+      }
+    }
+  }
+
+  // displaying the status
+  if (gameStatus != null && gameStatus != GameStatus.ACTIVE) {
+    val winner = gameStatus.winnerColor
+    val label = when {
+      winner != null && playerColor == winner ->
+        "You won!"
+      winner != null && playerColor != winner ->
+        "You lost!"
+      else ->
+        "Draw"
+    }
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color(0x4d000000)),
+      verticalArrangement = Arrangement.Center,
+    ) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .background(color = MaterialTheme.colorScheme.background)
+          .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        Text(
+          text = label,
+          style = MaterialTheme.typography.headlineMedium,
+        )
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          Button(onClick = { onPlayAgain() }) {
+            Text("Again!")
+          }
+          TextButton(onClick = { onBattleLeave() }) {
+            Text("Menu")
+          }
+        }
       }
     }
   }

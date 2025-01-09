@@ -45,6 +45,7 @@ class OnlineViewModel : ViewModel() {
 
   fun leaveQueue() {
     _state.value = OnlineState.IN_MENU
+    resetFlows()
   }
 
   fun joinBattle(enemy: PlayerInfo) {
@@ -58,12 +59,7 @@ class OnlineViewModel : ViewModel() {
 
   fun leaveBattle() {
     _state.value = OnlineState.IN_MENU
-    _enemy.value = null
-    _color.value = null
-    _playerTime.value = null
-    _enemyTime.value = null
-    _gameStatus.value = null
-    _boardState.value = null
+    resetFlows()
   }
 
   fun setTime(player: PieceColor, time: Int) {
@@ -82,5 +78,14 @@ class OnlineViewModel : ViewModel() {
   fun setBoardState(pieces: List<Pair<Int, SquareState>>, turn: PieceColor) {
     _boardState.value = pieces
     _turn.value = turn
+  }
+
+  private fun resetFlows() {
+    _enemy.value = null
+    _color.value = null
+    _playerTime.value = null
+    _enemyTime.value = null
+    _gameStatus.value = null
+    _boardState.value = null
   }
 }
