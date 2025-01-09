@@ -36,6 +36,9 @@ class OnlineViewModel : ViewModel() {
   private val _boardState = MutableStateFlow<List<Pair<Int, SquareState>>?>(null)
   val boardState = _boardState.asStateFlow()
 
+  private val _turn = MutableStateFlow<PieceColor?>(null)
+  val turn = _turn.asStateFlow()
+
   fun joinQueue() {
     _state.value = OnlineState.IN_QUEUE
   }
@@ -76,7 +79,8 @@ class OnlineViewModel : ViewModel() {
     _gameStatus.value = status
   }
 
-  fun setBoardState(pieces: List<Pair<Int, SquareState>>) {
+  fun setBoardState(pieces: List<Pair<Int, SquareState>>, turn: PieceColor) {
     _boardState.value = pieces
+    _turn.value = turn
   }
 }

@@ -5,8 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
-@Serializable
 @OptIn(ExperimentalSerializationApi::class)
+@Serializable
 @JsonClassDiscriminator("type")
 sealed class IncomingMessage {
   // messages with payload
@@ -28,7 +28,7 @@ sealed class IncomingMessage {
   @SerialName("board")
   data class Board(
     @SerialName("payload")
-    val payload: List<Piece>,
+    val payload: BoardPayload,
   ) : IncomingMessage()
 
   @Serializable

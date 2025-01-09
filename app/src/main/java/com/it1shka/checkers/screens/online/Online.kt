@@ -73,7 +73,7 @@ fun Online(
             }
           }
           is IncomingMessage.Board -> {
-            val pieces = message.payload.map { jsonPiece ->
+            val pieces = message.payload.pieces.map { jsonPiece ->
               val squareState = when {
                 jsonPiece.color == "black" && jsonPiece.type == "man" ->
                   SquareState.BLACK_MAN
@@ -92,7 +92,7 @@ fun Online(
                 jsonPiece.square to squareState
               }
             }.filterNotNull()
-            mainViewModel.setBoardState(pieces)
+            mainViewModel.setBoardState(pieces, message.payload.turn.asColor)
           }
 
           else -> {

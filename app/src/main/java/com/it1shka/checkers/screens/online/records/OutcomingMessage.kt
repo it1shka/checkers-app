@@ -4,10 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class OutcomingMessage(
-  @SerialName("type") val type: String,
-) {
-
+sealed class OutcomingMessage(@SerialName("type") val type: String) {
   @Serializable
   class Join : OutcomingMessage("join")
 
@@ -19,5 +16,4 @@ sealed class OutcomingMessage(
     @SerialName("from") val from: Int,
     @SerialName("to") val to: Int,
   ) : OutcomingMessage("move")
-
 }

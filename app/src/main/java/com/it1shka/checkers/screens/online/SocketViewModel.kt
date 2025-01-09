@@ -10,7 +10,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.ClassDiscriminatorMode
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,6 +25,16 @@ import java.nio.charset.StandardCharsets
 enum class SocketState {
   CLOSED,
   OPEN,
+}
+
+val jsonOutcoming = Json {
+  ignoreUnknownKeys = true
+  classDiscriminator = "type"
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+val jsonIncoming = Json {
+  classDiscriminatorMode = ClassDiscriminatorMode.NONE
 }
 
 class SocketViewModel : ViewModel() {
@@ -97,7 +109,7 @@ class SocketViewModel : ViewModel() {
 
   private fun onSocketMessage(webSocket: WebSocket, text: String) {
     try {
-      Json { ignoreUnknownKeys = true }
+      jsonOutcoming
         .decodeFromString<IncomingMessage>(text)
         .let { msg ->
           _incomingMessages.trySend(msg)
@@ -114,7 +126,7 @@ class SocketViewModel : ViewModel() {
     }
     socket?.let { ws ->
       try {
-        val preparedMessage = Json.encodeToString(message)
+        val preparedMessage = jsonIncoming.encodeToString(message)
         ws.send(preparedMessage)
       } catch (e: Exception) {
         val message = e.message ?: "no message"
