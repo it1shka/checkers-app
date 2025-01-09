@@ -27,13 +27,13 @@ enum class SocketState {
   OPEN,
 }
 
-val jsonOutcoming = Json {
+val jsonReceive = Json {
   ignoreUnknownKeys = true
   classDiscriminator = "type"
 }
 
 @OptIn(ExperimentalSerializationApi::class)
-val jsonIncoming = Json {
+val jsonSend = Json {
   classDiscriminatorMode = ClassDiscriminatorMode.NONE
 }
 
@@ -109,7 +109,7 @@ class SocketViewModel : ViewModel() {
 
   private fun onSocketMessage(webSocket: WebSocket, text: String) {
     try {
-      jsonOutcoming
+      jsonReceive
         .decodeFromString<IncomingMessage>(text)
         .let { msg ->
           _incomingMessages.trySend(msg)
@@ -126,7 +126,7 @@ class SocketViewModel : ViewModel() {
     }
     socket?.let { ws ->
       try {
-        val preparedMessage = jsonIncoming.encodeToString(message)
+        val preparedMessage = jsonSend.encodeToString(message)
         ws.send(preparedMessage)
       } catch (e: Exception) {
         val message = e.message ?: "no message"

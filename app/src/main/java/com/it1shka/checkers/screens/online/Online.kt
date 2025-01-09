@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import com.it1shka.checkers.components.ConfirmBackHandler
+import com.it1shka.checkers.screens.online.records.MovePayload
 import com.it1shka.checkers.screens.online.records.OutcomingMessage
 import com.it1shka.checkers.screens.online.records.PlayerInfo
 
@@ -117,8 +118,10 @@ fun Online(
   fun move(from: Int, to: Int) {
     socketViewModel.sendMessage(
       OutcomingMessage.Move(
-        from = from,
-        to = to,
+        payload = MovePayload(
+          from = from,
+          to = to,
+        )
       )
     )
   }

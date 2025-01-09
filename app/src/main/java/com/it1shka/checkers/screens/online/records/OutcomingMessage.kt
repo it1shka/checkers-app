@@ -12,8 +12,8 @@ sealed class OutcomingMessage(@SerialName("type") val type: String) {
   class Leave : OutcomingMessage("leave")
 
   @Serializable
-  data class Move(
-    @SerialName("from") val from: Int,
-    @SerialName("to") val to: Int,
+  class Move(
+    @SerialName("payload")
+    val payload: MovePayload
   ) : OutcomingMessage("move")
 }
