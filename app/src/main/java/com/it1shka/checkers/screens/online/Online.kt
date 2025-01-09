@@ -117,6 +117,12 @@ fun Online(
     )
   }
 
+  fun leaveQueue() {
+    socketViewModel.sendMessage(
+      OutcomingMessage.Leave()
+    )
+  }
+
   fun move(from: Int, to: Int) {
     socketViewModel.sendMessage(
       OutcomingMessage.Move(
@@ -186,9 +192,11 @@ fun Online(
         title = "Quitting battle queue",
         text = "You will stop searching for an enemy"
       ) {
-        // TODO:
+        leaveQueue()
       }
-      // TODO:
+      QueueLoading(
+        onQuit = ::leaveQueue
+      )
     }
     OnlineState.IN_BATTLE -> {
       if (gameStatus == null || gameStatus == GameStatus.ACTIVE) {
