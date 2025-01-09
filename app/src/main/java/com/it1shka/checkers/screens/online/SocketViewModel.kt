@@ -9,7 +9,7 @@ import com.it1shka.checkers.screens.online.records.PlayerInfo
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.ClassDiscriminatorMode
@@ -48,8 +48,8 @@ class SocketViewModel : ViewModel() {
   private val _socketState = MutableStateFlow(SocketState.CLOSED)
   val socketState = _socketState.asStateFlow()
 
-  private val _incomingMessages = Channel<IncomingMessage>()
-  val incomingMessage = _incomingMessages.receiveAsFlow()
+  private val _incomingMessages = Channel<IncomingMessage>(Channel.UNLIMITED)
+  val incomingMessage = _incomingMessages.consumeAsFlow()
 
   private fun getSocketRequest(player: PlayerInfo): Request {
     // https://github.com/square/okhttp/issues/4035
@@ -100,6 +100,8 @@ class SocketViewModel : ViewModel() {
     val failure = t.message ?: "no message"
     Log.e("WebSocket Failure", "Response: $message")
     Log.e("WebSocket Failure", "Failure: $failure")
+    Log.e("Websocket Failure", "Closing websocket due to the failure")
+    closeSocket()
   }
 
   private fun onSocketMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -140,11 +142,13 @@ class SocketViewModel : ViewModel() {
       code = 1000,
       reason = "client closed the connection",
     )
+    _socketState.value = SocketState.CLOSED
     socket = null
   }
 
   override fun onCleared() {
     super.onCleared()
+    _incomingMessages.close()
     closeSocket()
   }
 }

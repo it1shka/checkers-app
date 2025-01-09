@@ -13,8 +13,10 @@ import com.it1shka.checkers.screens.online.records.IncomingMessage
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.it1shka.checkers.components.ConfirmBackHandler
+import com.it1shka.checkers.components.withConfirmation
 import com.it1shka.checkers.screens.online.records.MovePayload
 import com.it1shka.checkers.screens.online.records.OutcomingMessage
 import com.it1shka.checkers.screens.online.records.PlayerInfo
@@ -126,7 +128,22 @@ fun Online(
     )
   }
 
+  fun leaveBattle() {
+    socketViewModel.sendMessage(
+      OutcomingMessage.Leave()
+    )
+    mainViewModel.leaveBattle()
+  }
+
   val socketState by socketViewModel.socketState.collectAsState()
+  LaunchedEffect(socketState) {
+    if (socketState == SocketState.CLOSED) {
+      Log.e("Online", "Quitting due to the network error")
+      mainViewModel.leaveBattle()
+      mainViewModel.leaveQueue()
+    }
+  }
+
   val screenState by mainViewModel.state.collectAsState()
 
   val enemy by mainViewModel.enemy.collectAsState()
@@ -136,6 +153,21 @@ fun Online(
   val gameStatus by mainViewModel.gameStatus.collectAsState()
   val boardState by mainViewModel.boardState.collectAsState()
   val turn by mainViewModel.turn.collectAsState()
+
+  val context = LocalContext.current
+  fun leaveBattleWithConfirmation() {
+    if (gameStatus == null || gameStatus == GameStatus.ACTIVE) {
+      withConfirmation(
+        context = context,
+        title = "Quitting battle",
+        message = "Are you sure? You will lose this battle"
+      ) {
+        leaveBattle()
+      }
+      return
+    }
+    leaveBattle()
+  }
 
   when (screenState) {
     OnlineState.IN_MENU -> {
@@ -159,17 +191,15 @@ fun Online(
       // TODO:
     }
     OnlineState.IN_BATTLE -> {
-      ConfirmBackHandler(
-        title = "Quitting battle",
-        text = "Are you sure? You will lose this battle",
-      ) {
-        socketViewModel.sendMessage(
-          OutcomingMessage.Leave()
-        )
-        mainViewModel.leaveBattle()
+      if (gameStatus == null || gameStatus == GameStatus.ACTIVE) {
+        ConfirmBackHandler(
+          title = "Quitting battle",
+          text = "Are you sure? You will lose this battle",
+        ) {
+          leaveBattle()
+        }
       }
       OnlineBattle(
-        nav = nav,
         player = player,
         enemy = enemy,
         playerColor = playerColor,
@@ -179,6 +209,7 @@ fun Online(
         boardState = boardState,
         turn = turn,
         onMove = ::move,
+        onBattleLeave = ::leaveBattleWithConfirmation
       )
     }
   }
