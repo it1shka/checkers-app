@@ -114,6 +114,15 @@ fun Online(
     )
   }
 
+  fun move(from: Int, to: Int) {
+    socketViewModel.sendMessage(
+      OutcomingMessage.Move(
+        from = from,
+        to = to,
+      )
+    )
+  }
+
   val socketState by socketViewModel.socketState.collectAsState()
   val screenState by mainViewModel.state.collectAsState()
 
@@ -166,6 +175,7 @@ fun Online(
         gameStatus = gameStatus,
         boardState = boardState,
         turn = turn,
+        onMove = ::move,
       )
     }
   }

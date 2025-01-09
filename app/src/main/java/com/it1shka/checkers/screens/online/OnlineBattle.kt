@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +25,8 @@ import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.asSquare
 import com.it1shka.checkers.screens.online.records.PlayerInfo
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 private const val LOADING = "Loading..."
 
@@ -38,6 +41,7 @@ fun OnlineBattle(
   gameStatus: GameStatus?,
   boardState: List<Pair<Int, SquareState>>?,
   turn: PieceColor?,
+  onMove: (from: Int, to: Int) -> Unit,
 ) {
   val pieces = remember(playerColor, boardState) {
     if (playerColor == PieceColor.BLACK) return@remember boardState
@@ -47,6 +51,41 @@ fun OnlineBattle(
       if (inverseSquare == null) null
       else inverseSquare to squareState
     }?.filterNotNull()
+  }
+
+  var chosenSquare by remember { mutableStateOf<Int?>(null) }
+
+  fun squareTouch(rawSquare: Int) {
+    val touchedSquare =
+      if (playerColor == PieceColor.BLACK) rawSquare
+      else {
+        rawSquare.asSquare?.inverse?.value
+      }
+
+    if (touchedSquare == null) return
+
+    when (chosenSquare) {
+      null -> {
+        chosenSquare = touchedSquare
+      }
+      touchedSquare -> {
+        chosenSquare = null
+      }
+      else -> {
+        chosenSquare?.let { from ->
+          onMove(from, touchedSquare)
+        }
+        chosenSquare = null
+      }
+    }
+  }
+
+  // TODO: implement proper highlighting
+  val highlight = remember(chosenSquare) {
+    val square = if (playerColor == PieceColor.BLACK)
+      chosenSquare
+      else chosenSquare?.asSquare?.inverse?.value
+    square?.let { listOf(it) } ?: listOf()
   }
 
   Column(
@@ -94,7 +133,8 @@ fun OnlineBattle(
       // chessboard
       Chessboard(
         state = pieces ?: listOf(),
-        // TODO:
+        highlight = highlight,
+        onSquareClick = ::squareTouch
       )
 
       // player information
@@ -123,6 +163,18 @@ fun OnlineBattle(
             contentDescription = "Player Icon",
           )
         }
+      }
+
+      // player turn
+      if (turn != null && gameStatus == GameStatus.ACTIVE) {
+        val turnLabel =
+          if (turn == playerColor) "Your turn"
+          else "Opponent's turn"
+        Text(
+          text = turnLabel,
+          style = MaterialTheme.typography.headlineSmall,
+          color = MaterialTheme.colorScheme.secondary,
+        )
       }
     }
   }
