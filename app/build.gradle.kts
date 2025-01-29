@@ -22,7 +22,9 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "SOCKET_SCHEME", "\"ws\"")
-            buildConfigField("String", "SOCKET_HOST", "\"10.0.2.2\"")
+            // For local testing only
+            // buildConfigField("String", "SOCKET_HOST", "\"10.0.2.2\"")
+            buildConfigField("String", "SOCKET_HOST", "\"130.61.188.59\"")
             buildConfigField("int", "SOCKET_PORT", "3056")
         }
         release {
@@ -31,6 +33,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "SOCKET_SCHEME", "\"ws\"")
+            buildConfigField("String", "SOCKET_HOST", "\"130.61.188.59\"")
+            buildConfigField("int", "SOCKET_PORT", "3056")
         }
     }
 
