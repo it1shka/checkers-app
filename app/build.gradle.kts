@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
@@ -19,22 +20,36 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "SOCKET_SCHEME", "\"ws\"")
+            // For local testing only
+            // buildConfigField("String", "SOCKET_HOST", "\"10.0.2.2\"")
+            buildConfigField("String", "SOCKET_HOST", "\"130.61.188.59\"")
+            buildConfigField("int", "SOCKET_PORT", "3056")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "SOCKET_SCHEME", "\"ws\"")
+            buildConfigField("String", "SOCKET_HOST", "\"130.61.188.59\"")
+            buildConfigField("int", "SOCKET_PORT", "3056")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -51,6 +66,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
