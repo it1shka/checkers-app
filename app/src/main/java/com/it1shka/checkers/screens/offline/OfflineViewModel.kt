@@ -2,6 +2,7 @@ package com.it1shka.checkers.screens.offline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.it1shka.checkers.gamelogic.BoardMove
 import com.it1shka.checkers.gamelogic.BotMinimax
 import com.it1shka.checkers.gamelogic.BotRandom
 import com.it1shka.checkers.gamelogic.CheckersBot
@@ -13,8 +14,10 @@ import com.it1shka.checkers.gamelogic.Square
 import com.it1shka.checkers.gamelogic.squarePairAsMove
 import com.it1shka.checkers.screens.battle.BotDifficulty
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -40,19 +43,27 @@ class OfflineViewModel : ViewModel() {
   private val _state = MutableStateFlow(OfflineState.new())
   val state = _state.asStateFlow()
 
+  private val _moves = Channel<BoardMove>(Channel.UNLIMITED)
+  val moves = _moves.consumeAsFlow()
+
+  private val _startRecording = Channel<String>(Channel.UNLIMITED)
+  val startRecording = _startRecording.consumeAsFlow()
+
   fun setDifficulty(difficulty: BotDifficulty) {
+    val newBot = when (difficulty) {
+      BotDifficulty.EASY -> BotRandom()
+      BotDifficulty.NORMAL -> BotMinimax(MinimaxConfigs.normal)
+      BotDifficulty.HARD -> BotMinimax(MinimaxConfigs.intermediate)
+      else -> BotMinimax(MinimaxConfigs.strong)
+    }
     _state.update { offlineState ->
-      val newBot = when (difficulty) {
-        BotDifficulty.EASY -> BotRandom()
-        BotDifficulty.NORMAL -> BotMinimax(MinimaxConfigs.normal)
-        BotDifficulty.HARD -> BotMinimax(MinimaxConfigs.intermediate)
-        else -> BotMinimax(MinimaxConfigs.strong)
-      }
       offlineState.copy(bot = newBot)
     }
+    _startRecording.trySend(newBot.name)
   }
 
   fun setPlayerColor(playerColor: PieceColor) {
+    _startRecording.trySend(_state.value.bot.name)
     _state.update { offlineState ->
       offlineState.copy(
         session = GameSession.new(),
@@ -71,6 +82,7 @@ class OfflineViewModel : ViewModel() {
   }
 
   fun restart() {
+    _startRecording.trySend(_state.value.bot.name)
     _state.update { offlineState ->
       offlineState.copy(
         session = GameSession.new(),
@@ -103,6 +115,7 @@ class OfflineViewModel : ViewModel() {
       !selfClick && state.pivotSquare != null && myTurn && sessionActive -> {
        (state.pivotSquare to clickedSquare).squarePairAsMove
          ?.let { move ->
+           _moves.trySend(move)
            state.session.makeMove(move)
          }
          ?.let { nextSession ->
@@ -150,5 +163,10 @@ class OfflineViewModel : ViewModel() {
           }
         }
     }
+  }
+
+  override fun onCleared() {
+    _moves.close()
+    _startRecording.close()
   }
 }

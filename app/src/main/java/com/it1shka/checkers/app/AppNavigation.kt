@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
+import com.it1shka.checkers.data.PersistViewModel
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.offline.Offline
 import com.it1shka.checkers.screens.online.Online
@@ -40,41 +41,48 @@ data class AppRouteArgs(
   val region: String,
 )
 
-fun getRouting(navController: NavController, args: AppRouteArgs) = listOf(
-  AppRoute(AppScreen.BATTLE, {
-    Battle(
-      nav = navController,
-      initialDifficulty = args.difficulty,
-    )
-  }),
-  AppRoute(AppScreen.OFFLINE_BATTLE, {
-    Offline(
-      nav = navController,
-      initialDifficulty = args.difficulty,
-      initialColor = args.color,
-    )
-  }),
-  AppRoute(AppScreen.ONLINE_BATTLE, {
-    Online(
-      nav = navController,
-      nickname = args.nickname,
-      rating = args.rating,
-      region = args.region,
-    )
-  }),
-  AppRoute(AppScreen.HISTORY, {
-    Column(modifier = Modifier.fillMaxSize()) {
-      Text("TODO: ")
-    }
-  }),
-  AppRoute(AppScreen.PROFILE, {
-    Profile(
-      initialNickname = args.nickname,
-      initialRating = args.rating,
-      initialRegion = args.region,
-    )
-  })
-)
+fun getRouting(
+  navController: NavController,
+  args: AppRouteArgs,
+  persistViewModel: PersistViewModel,
+): List<AppRoute> {
+  return listOf(
+    AppRoute(AppScreen.BATTLE, {
+      Battle(
+        nav = navController,
+        initialDifficulty = args.difficulty,
+      )
+    }),
+    AppRoute(AppScreen.OFFLINE_BATTLE, {
+      Offline(
+        nav = navController,
+        initialDifficulty = args.difficulty,
+        initialColor = args.color,
+        persistViewModel = persistViewModel,
+      )
+    }),
+    AppRoute(AppScreen.ONLINE_BATTLE, {
+      Online(
+        nav = navController,
+        nickname = args.nickname,
+        rating = args.rating,
+        region = args.region,
+      )
+    }),
+    AppRoute(AppScreen.HISTORY, {
+      Column(modifier = Modifier.fillMaxSize()) {
+        Text("TODO: ")
+      }
+    }),
+    AppRoute(AppScreen.PROFILE, {
+      Profile(
+        initialNickname = args.nickname,
+        initialRating = args.rating,
+        initialRegion = args.region,
+      )
+    })
+  )
+}
 
 data class NavbarItem(
   val screen: AppScreen,

@@ -32,6 +32,7 @@ import com.it1shka.checkers.components.Chessboard
 import com.it1shka.checkers.components.ConfirmBackHandler
 import com.it1shka.checkers.components.SquareState
 import com.it1shka.checkers.components.withConfirmation
+import com.it1shka.checkers.data.PersistViewModel
 import com.it1shka.checkers.gamelogic.GameStatus
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.gamelogic.PieceType
@@ -45,6 +46,7 @@ fun Offline(
   nav: NavController,
   initialDifficulty: String,
   initialColor: String,
+  persistViewModel: PersistViewModel,
   viewModel: OfflineViewModel = viewModel(),
   timerViewModel: TimerViewModel = viewModel(),
 ) {
@@ -57,6 +59,21 @@ fun Offline(
 
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+
+  // recording game into db
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      viewModel.startRecording.collect { botNickname ->
+        persistViewModel.openGame(botNickname)
+      }
+    }
+
+    coroutineScope.launch {
+      viewModel.moves.collect { move ->
+        persistViewModel.addMove(move.from.value, move.to.value)
+      }
+    }
+  }
 
   val timer by timerViewModel.timer.collectAsState()
   LaunchedEffect(Unit) {

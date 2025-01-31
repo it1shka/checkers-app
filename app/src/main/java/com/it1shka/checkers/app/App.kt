@@ -10,11 +10,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.it1shka.checkers.Preferences
+import com.it1shka.checkers.data.AppDatabase
+import com.it1shka.checkers.data.PersistViewModel
+import com.it1shka.checkers.data.PersistViewModelFactory
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.screens.battle.BotDifficulty
 
@@ -51,13 +55,24 @@ fun App() {
     .getRegion(context)
     .collectAsState("Unknown")
 
-  val routes = getRouting(navController, AppRouteArgs(
+  val routingArgs = AppRouteArgs(
     difficulty = botDifficulty,
     color = playerColor,
     nickname = nickname,
     rating = rating,
     region = region,
-  ))
+  )
+
+  val database = AppDatabase.getDatabase(context)
+  val persistViewModel: PersistViewModel = viewModel(
+    factory = PersistViewModelFactory(database)
+  )
+
+  val routes = getRouting(
+    navController = navController,
+    args = routingArgs,
+    persistViewModel = persistViewModel,
+  )
 
   MaterialTheme {
     Scaffold(
