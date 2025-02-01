@@ -153,6 +153,7 @@ class OfflineViewModel : ViewModel() {
     while (session.status == GameStatus.ACTIVE && session.turn == botColor) {
       bot.findMove(session.board)
         ?.let { move ->
+          _moves.trySend(move)
           session.makeMove(move)
         }
         ?.let { nextSession ->

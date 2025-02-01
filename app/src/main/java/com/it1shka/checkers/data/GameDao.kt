@@ -12,8 +12,8 @@ interface GameDao {
   fun getGames(): Flow<List<GameEntity>>
 
   @Transaction
-  @Query("select * from gameentity where id = :gameId")
-  fun getGameWithMovesById(gameId: String): Flow<List<GameWithMoves>>
+  @Query("select * from gameentity where id = :gameId limit 1")
+  fun getGameWithMovesById(gameId: String): Flow<GameWithMoves>
 
   @Insert
   suspend fun insertGame(game: GameEntity)

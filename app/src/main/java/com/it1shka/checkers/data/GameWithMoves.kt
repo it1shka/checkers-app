@@ -10,6 +10,7 @@ data class GameWithMoves (
   @Relation(
     parentColumn = "id",
     entityColumn = "game_id",
+    entity = MoveEntity::class,
   )
   val moves: List<MoveEntity>
 )

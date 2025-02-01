@@ -1,7 +1,5 @@
 package com.it1shka.checkers.app
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
@@ -9,14 +7,14 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.it1shka.checkers.data.PersistViewModel
 import com.it1shka.checkers.screens.battle.Battle
 import com.it1shka.checkers.screens.history.History
+import com.it1shka.checkers.screens.history.HistoryReplay
+import com.it1shka.checkers.screens.history.HistoryViewModel
 import com.it1shka.checkers.screens.offline.Offline
 import com.it1shka.checkers.screens.online.Online
 import com.it1shka.checkers.screens.profile.Profile
@@ -26,6 +24,7 @@ enum class AppScreen {
   OFFLINE_BATTLE,
   ONLINE_BATTLE,
   HISTORY,
+  HISTORY_REPLAY,
   PROFILE,
 }
 
@@ -46,6 +45,7 @@ fun getRouting(
   navController: NavController,
   args: AppRouteArgs,
   persistViewModel: PersistViewModel,
+  historyViewModel: HistoryViewModel,
 ): List<AppRoute> {
   return listOf(
     AppRoute(AppScreen.BATTLE, {
@@ -72,7 +72,15 @@ fun getRouting(
     }),
     AppRoute(AppScreen.HISTORY, {
       History(
+        nav = navController,
         persistViewModel = persistViewModel,
+        historyViewModel = historyViewModel,
+      )
+    }),
+    AppRoute(AppScreen.HISTORY_REPLAY, {
+      HistoryReplay(
+        persistViewModel = persistViewModel,
+        historyViewModel = historyViewModel,
       )
     }),
     AppRoute(AppScreen.PROFILE, {

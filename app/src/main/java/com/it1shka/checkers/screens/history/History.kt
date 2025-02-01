@@ -2,6 +2,7 @@ package com.it1shka.checkers.screens.history
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.it1shka.checkers.app.AppScreen
 import com.it1shka.checkers.data.PersistViewModel
 import java.time.Instant
 import java.time.LocalDateTime
@@ -36,8 +39,17 @@ private fun Long.asPrettyTimestamp(): String {
 }
 
 @Composable
-fun History(persistViewModel: PersistViewModel) {
+fun History(
+  nav: NavController,
+  persistViewModel: PersistViewModel,
+  historyViewModel: HistoryViewModel,
+) {
   val games by persistViewModel.games.collectAsState(listOf())
+
+  fun chooseGame(gameId: String) {
+    historyViewModel.chooseGameId(gameId)
+    nav.navigate(AppScreen.HISTORY_REPLAY.name)
+  }
 
   Column(
     modifier = Modifier
@@ -74,6 +86,10 @@ fun History(persistViewModel: PersistViewModel) {
           ),
           modifier = Modifier
             .padding(top = 8.dp)
+            .clickable(
+              enabled = true,
+              onClick = { chooseGame(game.id) }
+            )
         ) {
           Row(
             modifier = Modifier

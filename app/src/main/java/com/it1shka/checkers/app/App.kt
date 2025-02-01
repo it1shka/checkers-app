@@ -21,6 +21,7 @@ import com.it1shka.checkers.data.PersistViewModel
 import com.it1shka.checkers.data.PersistViewModelFactory
 import com.it1shka.checkers.gamelogic.PieceColor
 import com.it1shka.checkers.screens.battle.BotDifficulty
+import com.it1shka.checkers.screens.history.HistoryViewModel
 
 @Composable
 fun App() {
@@ -67,11 +68,13 @@ fun App() {
   val persistViewModel: PersistViewModel = viewModel(
     factory = PersistViewModelFactory(database)
   )
+  val historyViewModel: HistoryViewModel = viewModel()
 
   val routes = getRouting(
     navController = navController,
     args = routingArgs,
     persistViewModel = persistViewModel,
+    historyViewModel = historyViewModel,
   )
 
   MaterialTheme {
