@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -144,16 +147,30 @@ fun HistoryReplay(
       Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
       ) {
-        Button(
-          onClick = { historyViewModel.pointerPrev() }
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(16.dp),
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-          Text("Back")
-        }
-        Button(
-          onClick = { historyViewModel.pointerNext(game?.moves?.size) }
-        ) {
-          Text("Next")
+          IconButton(onClick = {historyViewModel.pointerPrev()}) {
+            Icon(
+              Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+              contentDescription = "Previous",
+            )
+          }
+          IconButton(onClick = {historyViewModel.pointerRestart()}) {
+            Icon(
+              Icons.Default.Refresh,
+              contentDescription = "Restart"
+            )
+          }
+          IconButton(onClick = {historyViewModel.pointerNext(game?.moves?.size)}) {
+            Icon(
+              Icons.AutoMirrored.Filled.KeyboardArrowRight,
+              contentDescription = "Next"
+            )
+          }
         }
       }
     }
