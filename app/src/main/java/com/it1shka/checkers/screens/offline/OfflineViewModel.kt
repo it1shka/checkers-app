@@ -63,6 +63,7 @@ class OfflineViewModel : ViewModel() {
   }
 
   fun setPlayerColor(playerColor: PieceColor) {
+    // TODO: here is the problem
     _startRecording.trySend(_state.value.bot.name)
     _state.update { offlineState ->
       offlineState.copy(

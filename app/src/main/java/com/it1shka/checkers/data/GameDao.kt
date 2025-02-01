@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GameDao {
-  @Query("select * from gameentity")
+  @Query("select * from gameentity order by playedAt desc")
   fun getGames(): Flow<List<GameEntity>>
 
   @Transaction

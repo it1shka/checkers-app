@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.it1shka.checkers.data.PersistViewModel
 import com.it1shka.checkers.screens.battle.Battle
+import com.it1shka.checkers.screens.history.History
 import com.it1shka.checkers.screens.offline.Offline
 import com.it1shka.checkers.screens.online.Online
 import com.it1shka.checkers.screens.profile.Profile
@@ -70,9 +71,9 @@ fun getRouting(
       )
     }),
     AppRoute(AppScreen.HISTORY, {
-      Column(modifier = Modifier.fillMaxSize()) {
-        Text("TODO: ")
-      }
+      History(
+        persistViewModel = persistViewModel,
+      )
     }),
     AppRoute(AppScreen.PROFILE, {
       Profile(

@@ -19,4 +19,7 @@ data class GameEntity (
 
   @Embedded(prefix = "enemy_")
   val enemy: Enemy,
+
+  @ColumnInfo(name = "playedAt")
+  val playedAt: Long,
 )

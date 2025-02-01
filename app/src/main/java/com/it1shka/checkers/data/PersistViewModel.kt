@@ -10,27 +10,25 @@ import java.util.UUID
 
 class PersistViewModel(private val database: AppDatabase) : ViewModel() {
   private val gameId = MutableStateFlow<String?>(null)
+  private val enemy = MutableStateFlow<Enemy?>(null)
+  private val startTime = MutableStateFlow<Long>(System.currentTimeMillis())
   private val moveOrder = MutableStateFlow(0)
+
+  val games = database.gameDao().getGames()
 
   fun openGame(nickname: String, rating: Int? = null, region: String? = null) {
     moveOrder.value = 0
-    val enemy = Enemy(
+    gameId.value = null
+    enemy.value = Enemy(
       nickname = nickname,
       rating = rating,
       region = region,
     )
-    val uuid = UUID.randomUUID().toString();
-    val gameEntity = GameEntity(
-      id = uuid,
-      enemy = enemy,
-    )
-    viewModelScope.launch(Dispatchers.IO) {
-      database.gameDao().insertGame(gameEntity)
-    }
-    gameId.value = uuid
+    startTime.value = System.currentTimeMillis()
   }
 
   fun addMove(from: Int, to: Int) {
+    createGameIfNotExists()
     val currentGameId = gameId.value
     if (currentGameId == null) return
     val uuid = UUID.randomUUID().toString();
@@ -44,6 +42,22 @@ class PersistViewModel(private val database: AppDatabase) : ViewModel() {
     moveOrder.value += 1
     viewModelScope.launch(Dispatchers.IO) {
       database.moveDao().insertMove(moveEntity)
+    }
+  }
+
+  private fun createGameIfNotExists() {
+    if (gameId.value != null) return
+    enemy.value?.let { currentEnemy ->
+      val uuid = UUID.randomUUID().toString();
+      val gameEntity = GameEntity(
+        id = uuid,
+        enemy = currentEnemy,
+        playedAt = startTime.value,
+      )
+      viewModelScope.launch(Dispatchers.IO) {
+        database.gameDao().insertGame(gameEntity)
+      }
+      gameId.value = uuid
     }
   }
 }
