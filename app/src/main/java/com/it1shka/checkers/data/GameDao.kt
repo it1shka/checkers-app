@@ -13,7 +13,7 @@ interface GameDao {
 
   @Transaction
   @Query("select * from gameentity where id = :gameId")
-  fun getGameWithMovesById(gameId: Int): Flow<List<GameWithMoves>>
+  fun getGameWithMovesById(gameId: String): Flow<List<GameWithMoves>>
 
   @Insert
   suspend fun insertGame(game: GameEntity)

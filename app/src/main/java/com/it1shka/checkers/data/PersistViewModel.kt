@@ -15,6 +15,7 @@ class PersistViewModel(private val database: AppDatabase) : ViewModel() {
   private val moveOrder = MutableStateFlow(0)
 
   val games = database.gameDao().getGames()
+  fun gameMoveCount(gameId: String) = database.gameDao().getGameWithMovesById(gameId)
 
   fun openGame(nickname: String, rating: Int? = null, region: String? = null) {
     moveOrder.value = 0
