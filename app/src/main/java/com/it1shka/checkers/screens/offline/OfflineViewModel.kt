@@ -2,6 +2,8 @@ package com.it1shka.checkers.screens.offline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.it1shka.checkers.data.Enemy
+import com.it1shka.checkers.gamelogic.BoardMove
 import com.it1shka.checkers.gamelogic.BotMinimax
 import com.it1shka.checkers.gamelogic.BotRandom
 import com.it1shka.checkers.gamelogic.CheckersBot
@@ -13,8 +15,10 @@ import com.it1shka.checkers.gamelogic.Square
 import com.it1shka.checkers.gamelogic.squarePairAsMove
 import com.it1shka.checkers.screens.battle.BotDifficulty
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -36,29 +40,49 @@ data class OfflineState (
   }
 }
 
+data class RecordingInfo (
+  val playerColor: String,
+  val enemy: Enemy,
+)
+
 class OfflineViewModel : ViewModel() {
   private val _state = MutableStateFlow(OfflineState.new())
   val state = _state.asStateFlow()
 
+  private val _moves = Channel<BoardMove>(Channel.UNLIMITED)
+  val moves = _moves.consumeAsFlow()
+
+  private val _startRecording = Channel<RecordingInfo>(Channel.UNLIMITED)
+  val startRecording = _startRecording.consumeAsFlow()
+
   fun setDifficulty(difficulty: BotDifficulty) {
+    val newBot = when (difficulty) {
+      BotDifficulty.EASY -> BotRandom()
+      BotDifficulty.NORMAL -> BotMinimax(MinimaxConfigs.normal)
+      BotDifficulty.HARD -> BotMinimax(MinimaxConfigs.intermediate)
+      else -> BotMinimax(MinimaxConfigs.strong)
+    }
     _state.update { offlineState ->
-      val newBot = when (difficulty) {
-        BotDifficulty.EASY -> BotRandom()
-        BotDifficulty.NORMAL -> BotMinimax(MinimaxConfigs.normal)
-        BotDifficulty.HARD -> BotMinimax(MinimaxConfigs.intermediate)
-        else -> BotMinimax(MinimaxConfigs.strong)
-      }
       offlineState.copy(bot = newBot)
     }
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = newBot.name),
+      playerColor = state.value.playerColor.name
+    ))
   }
 
   fun setPlayerColor(playerColor: PieceColor) {
+    // TODO: here is the problem
     _state.update { offlineState ->
       offlineState.copy(
         session = GameSession.new(),
         playerColor = playerColor,
       )
     }
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = state.value.bot.name),
+      playerColor = playerColor.name,
+    ))
     if (playerColor == PieceColor.RED) {
       triggerBotResponseAsync()
     }
@@ -77,6 +101,10 @@ class OfflineViewModel : ViewModel() {
         pivotSquare = null,
       )
     }
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = state.value.bot.name),
+      playerColor = state.value.playerColor.name,
+    ))
     val playerColor = _state.value.playerColor
     if (playerColor == PieceColor.RED) {
       triggerBotResponseAsync()
@@ -103,6 +131,7 @@ class OfflineViewModel : ViewModel() {
       !selfClick && state.pivotSquare != null && myTurn && sessionActive -> {
        (state.pivotSquare to clickedSquare).squarePairAsMove
          ?.let { move ->
+           _moves.trySend(move)
            state.session.makeMove(move)
          }
          ?.let { nextSession ->
@@ -139,6 +168,7 @@ class OfflineViewModel : ViewModel() {
     while (session.status == GameStatus.ACTIVE && session.turn == botColor) {
       bot.findMove(session.board)
         ?.let { move ->
+          _moves.trySend(move)
           session.makeMove(move)
         }
         ?.let { nextSession ->
@@ -150,5 +180,10 @@ class OfflineViewModel : ViewModel() {
           }
         }
     }
+  }
+
+  override fun onCleared() {
+    _moves.close()
+    _startRecording.close()
   }
 }
