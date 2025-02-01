@@ -63,8 +63,11 @@ fun Offline(
   // recording game into db
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      viewModel.startRecording.collect { botNickname ->
-        persistViewModel.openGame(botNickname)
+      viewModel.startRecording.collect { info ->
+        persistViewModel.openGame(
+          enemy = info.enemy,
+          playerColor = info.playerColor,
+        )
       }
     }
 

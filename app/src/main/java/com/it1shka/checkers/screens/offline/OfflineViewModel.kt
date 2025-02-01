@@ -2,6 +2,7 @@ package com.it1shka.checkers.screens.offline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.it1shka.checkers.data.Enemy
 import com.it1shka.checkers.gamelogic.BoardMove
 import com.it1shka.checkers.gamelogic.BotMinimax
 import com.it1shka.checkers.gamelogic.BotRandom
@@ -39,6 +40,11 @@ data class OfflineState (
   }
 }
 
+data class RecordingInfo (
+  val playerColor: String,
+  val enemy: Enemy,
+)
+
 class OfflineViewModel : ViewModel() {
   private val _state = MutableStateFlow(OfflineState.new())
   val state = _state.asStateFlow()
@@ -46,7 +52,7 @@ class OfflineViewModel : ViewModel() {
   private val _moves = Channel<BoardMove>(Channel.UNLIMITED)
   val moves = _moves.consumeAsFlow()
 
-  private val _startRecording = Channel<String>(Channel.UNLIMITED)
+  private val _startRecording = Channel<RecordingInfo>(Channel.UNLIMITED)
   val startRecording = _startRecording.consumeAsFlow()
 
   fun setDifficulty(difficulty: BotDifficulty) {
@@ -59,18 +65,24 @@ class OfflineViewModel : ViewModel() {
     _state.update { offlineState ->
       offlineState.copy(bot = newBot)
     }
-    _startRecording.trySend(newBot.name)
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = newBot.name),
+      playerColor = state.value.playerColor.name
+    ))
   }
 
   fun setPlayerColor(playerColor: PieceColor) {
     // TODO: here is the problem
-    _startRecording.trySend(_state.value.bot.name)
     _state.update { offlineState ->
       offlineState.copy(
         session = GameSession.new(),
         playerColor = playerColor,
       )
     }
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = state.value.bot.name),
+      playerColor = playerColor.name,
+    ))
     if (playerColor == PieceColor.RED) {
       triggerBotResponseAsync()
     }
@@ -83,13 +95,16 @@ class OfflineViewModel : ViewModel() {
   }
 
   fun restart() {
-    _startRecording.trySend(_state.value.bot.name)
     _state.update { offlineState ->
       offlineState.copy(
         session = GameSession.new(),
         pivotSquare = null,
       )
     }
+    _startRecording.trySend(RecordingInfo(
+      enemy = Enemy(nickname = state.value.bot.name),
+      playerColor = state.value.playerColor.name,
+    ))
     val playerColor = _state.value.playerColor
     if (playerColor == PieceColor.RED) {
       triggerBotResponseAsync()

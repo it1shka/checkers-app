@@ -74,12 +74,10 @@ fun HistoryReplay(
         }
     }
     _board.pieces.map { piece ->
-      /* TODO:
-      val square = if(state.playerColor == PieceColor.BLACK)
+      val playerColor = game?.game?.playerColor
+      val square = if(playerColor == PieceColor.BLACK.name)
         piece.square.value
       else piece.square.inverse.value
-      */
-      val square = piece.square.value
       val squareState = when {
         piece.type == PieceType.MAN && piece.color == PieceColor.BLACK ->
           SquareState.BLACK_MAN
@@ -100,10 +98,16 @@ fun HistoryReplay(
         return@remember listOf<Int>()
       }
       val lastMove = it[pointer - 1]
-      listOf(
-        lastMove.from,
-        lastMove.to,
-      )
+      if (game?.game?.playerColor == PieceColor.BLACK.name)
+        listOf(
+          lastMove.from,
+          lastMove.to,
+        )
+      else
+        listOf(
+          lastMove.from.asSquare!!.inverse.value,
+          lastMove.to.asSquare!!.inverse.value,
+        )
     } ?: listOf<Int>()
   }
 

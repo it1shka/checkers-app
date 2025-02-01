@@ -17,6 +17,9 @@ data class GameEntity (
   @ColumnInfo(name = "id")
   val id: String,
 
+  @ColumnInfo(name = "player_color")
+  val playerColor: String,
+
   @Embedded(prefix = "enemy_")
   val enemy: Enemy,
 
