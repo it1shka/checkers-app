@@ -53,6 +53,11 @@ android {
         buildConfig = true
         compose = true
     }
+
+    packaging {
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/LICENSE-notice.md")
+    }
 }
 
 dependencies {
@@ -82,4 +87,15 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    // For UI Testing
+    val compose_version = "1.7.7"
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
+    debugImplementation(libs.ui.test.manifest)
+
+    // For mocking dependencies
+    val mockk_version = "1.13.14"
+    testImplementation("io.mockk:mockk:$mockk_version")
+    androidTestImplementation("io.mockk:mockk-android:$mockk_version")
+
 }
