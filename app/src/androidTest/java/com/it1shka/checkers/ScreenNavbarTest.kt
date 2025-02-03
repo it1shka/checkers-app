@@ -4,7 +4,6 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.it1shka.checkers.app.AppNavbar
 import com.it1shka.checkers.app.AppScreen
-import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,15 +12,27 @@ class ScreenNavbarTest {
 
   @Test
   fun hasThreeDestinations() {
-    val screen = mockk<AppScreen>()
     composeTestRule.setContent {
-      AppNavbar(screen) {}
+      AppNavbar(AppScreen.BATTLE) {}
     }
+    composeTestRule.onRoot().printToLog("TREE")
     val destinations = listOf("Battle", "History", "Profile")
     for (dest in destinations) {
       composeTestRule
-        .onNodeWithContentDescription(dest)
+        .onNodeWithText(dest)
         .assertExists()
+    }
+  }
+
+  @Test
+  fun destinationsAreClickable() {
+    composeTestRule.setContent {
+      AppNavbar(AppScreen.BATTLE) {}
+    }
+    val destinations = listOf("Battle", "History", "Profile")
+    for (dest in destinations) {
+      val node = composeTestRule.onNodeWithText(dest)
+      node.assertHasClickAction()
     }
   }
 }
