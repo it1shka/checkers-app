@@ -2,6 +2,8 @@ package com.it1shka.checkers
 
 import com.it1shka.checkers.gamelogic.Position
 import com.it1shka.checkers.gamelogic.Square
+import com.it1shka.checkers.gamelogic.asSquare
+import com.it1shka.checkers.gamelogic.isValidPosition
 import org.junit.Test
 import org.junit.Assert.*
 
@@ -43,6 +45,25 @@ class SquareTest {
     for ((square, expected) in testCases) {
       val actual = Square(square).position.value
       assertEquals(expected, actual)
+    }
+  }
+
+  @Test
+  fun `each square should be invertible`() {
+    val testCases = listOf(
+      1 to 32,
+      9 to 24,
+      10 to 23,
+      13 to 20,
+    )
+    for ((rawSquare, rawInvertedSquare) in testCases) {
+      val square = rawSquare.asSquare
+      val invertedSquare = rawInvertedSquare.asSquare
+      if (square == null || invertedSquare == null) {
+        fail("valid squares are null after the conversion")
+        return
+      }
+      assertEquals(square.inverse, invertedSquare)
     }
   }
 }
@@ -95,6 +116,21 @@ class PositionTest {
     for ((position, expected) in testCases) {
       val actual = Position(position).square.value
       assertEquals(expected, actual)
+    }
+  }
+
+  @Test
+  fun `valid positions should return true when checked`() {
+    val validPositions = listOf(
+      1 to 2,
+      1 to 4,
+      1 to 6,
+      4 to 3,
+      4 to 7,
+      6 to 5,
+    )
+    for (pos in validPositions) {
+      assertTrue(pos.isValidPosition)
     }
   }
 }
